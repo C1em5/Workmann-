@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Секретный код 💌</title>
+<style>
+body {
+  font-family: Arial;
+  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+.box {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+input {
+  padding: 12px;
+  width: 220px;
+  font-size: 16px;
+  text-align: center;
+}
+button {
+  margin-top: 15px;
+  padding: 12px 25px;
+  font-size: 16px;
+  cursor: pointer;
+}
+#error {
+  color: red;
+  margin-top: 15px;
+}
+</style>
+</head>
+
+<body>
+<div class="box">
+  <h2>Введите секретный код 💌</h2>
+
+  <input type="text" id="codeInput" placeholder="Введите код">
+  <br>
+  <button onclick="checkCode()">✨ Подтвердить</button>
+  <p id="error"></p>
+</div>
+
+<script>
+function checkCode() {
+  var code = document.getElementById("codeInput").value;
+
+  var links = {
+    "LOVE1": "https://sites.google.com/view/rtmpaladio/Paladio",
+    "LOVE2": "ССЫЛКА_НА_СТРАНИЦУ_2",
+    "LOVE3": "ССЫЛКА_НА_СТРАНИЦУ_3"
+  };
+
+  if (links[code]) {
+    window.location.href = links[code];
+  } else {
+    document.getElementById("error").innerText = "❌ Неверный код";
+  }
+}
+  fetch("https://api.telegram.org/bot8779672611:AAHfL9289ohb8GvDvKh1zxceX62I30Fmf-I/sendMessage", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    chat_id: "531516216",
+    text: "Она ввела код: " + code
+  })
+});
+</script>
+
+</body>
+</html>
