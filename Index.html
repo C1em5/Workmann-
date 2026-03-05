@@ -40,6 +40,7 @@ button {
 </head>
 
 <body>
+
 <div class="box">
   <h2>Введите секретный код 💌</h2>
 
@@ -54,9 +55,9 @@ function checkCode() {
   var code = document.getElementById("codeInput").value;
 
   var links = {
-    "LOVE1": "https://sites.google.com/view/rtmpaladio/Paladio",
-    "LOVE2": "ССЫЛКА_НА_СТРАНИЦУ_2",
-    "LOVE3": "ССЫЛКА_НА_СТРАНИЦУ_3"
+    "LOVE1": "https://google.com",
+    "LOVE2": "https://youtube.com",
+    "LOVE3": "https://github.com"
   };
 
   if (links[code]) {
@@ -65,7 +66,6 @@ function checkCode() {
     document.getElementById("error").innerText = "❌ Неверный код";
   }
 }
-});
 </script>
 
 </body>
