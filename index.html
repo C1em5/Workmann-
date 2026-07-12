@@ -37,21 +37,20 @@ body{
     align-items:center;
 
     opacity:0;
-    visibility:hidden;
+    pointer-events:none;
+
+    transform:translateX(40px);
 
     transition:
-        transform .6s ease,
-        opacity .6s ease;
-
-    transform:translateX(100%);
+        opacity .5s ease,
+        transform .5s ease;
 }
 
 .screen.active{
     opacity:1;
-    visibility:visible;
+    pointer-events:auto;
     transform:translateX(0);
 }
-
 .screen.exit{
     transform:translateX(-100%);
     opacity:0;
@@ -177,22 +176,11 @@ function changeScreen(next){
     const current = document.querySelector(".screen.active");
     const nextScreen = document.getElementById(next);
 
-    current.classList.add("exit-left");
     current.classList.remove("active");
-
-    nextScreen.classList.add("enter-right");
 
     setTimeout(() => {
         nextScreen.classList.add("active");
-    },20);
-
-    setTimeout(() => {
-
-        current.classList.remove("exit-left");
-
-        nextScreen.classList.remove("enter-right");
-
-    },700);
+    }, 250);
 
 }
 
