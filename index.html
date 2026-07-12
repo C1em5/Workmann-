@@ -795,10 +795,7 @@ button.text-link{
 const CONFIG = {
 
   // Коды доступа (регистр не важен, пробелы по краям обрезаются)
-  CODE1: "rT7iuX",
-  CODE1: "pG2clH",
-  CODE1: "zW8xwC",
-  CODE1: "qW1wcU",
+  CODE1: ["rT7iuX", "pG2clH", "zW8xwC", "qW1wcU"],
   CODE2: "ЛЮБОВЬ",
   ADMIN_CODE: "МАСТЕРКЛЮЧ",
 
@@ -1040,7 +1037,7 @@ function normalize(v){
 function submitCode1(){
   const input = document.getElementById('input-code1');
   const errorEl = document.getElementById('error-code1');
-  if(normalize(input.value) === normalize(CONFIG.CODE1)){
+  if(CONFIG.CODE1.map(normalize).includes(normalize(input.value))){
     state.code1Verified = true;
     saveState(state);
     errorEl.textContent = '';
