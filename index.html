@@ -29,35 +29,32 @@ body{
 /* ---------- Экраны ---------- */
 
 .screen{
-
     position:absolute;
-
-    width:100%;
-    height:100%;
+    inset:0;
 
     display:flex;
-
     justify-content:center;
     align-items:center;
 
     opacity:0;
+    visibility:hidden;
+
+    transition:
+        transform .6s ease,
+        opacity .6s ease;
 
     transform:translateX(100%);
-
-    transition:.6s;
-
-    pointer-events:none;
-
 }
 
 .screen.active{
-
     opacity:1;
-
+    visibility:visible;
     transform:translateX(0);
+}
 
-    pointer-events:auto;
-
+.screen.exit{
+    transform:translateX(-100%);
+    opacity:0;
 }
 
 /* ---------- Карточка ---------- */
@@ -118,14 +115,7 @@ p{
     line-height:1.6;
 
 }
-.enter-right{
-    transform:translateX(100%);
-}
 
-.exit-left{
-    transform:translateX(-100%);
-    opacity:0;
-}
 </style>
 
 </head>
