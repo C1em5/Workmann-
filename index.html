@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>RTM Gift</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    font-family:Arial, sans-serif;
+
+    background:linear-gradient(135deg,#ffd9a8,#ffe7c9);
+
+    overflow:hidden;
+
+}
+
+/* ---------- Экраны ---------- */
+
+.screen{
+
+    position:absolute;
+
+    width:100%;
+    height:100%;
+
+    display:flex;
+
+    justify-content:center;
+    align-items:center;
+
+    opacity:0;
+
+    transform:translateX(100%);
+
+    transition:.6s;
+
+    pointer-events:none;
+
+}
+
+.screen.active{
+
+    opacity:1;
+
+    transform:translateX(0);
+
+    pointer-events:auto;
+
+}
+
+/* ---------- Карточка ---------- */
+
+.card{
+
+    width:90%;
+    max-width:420px;
+
+    background:white;
+
+    border-radius:25px;
+
+    padding:35px;
+
+    box-shadow:0 15px 40px rgba(0,0,0,.2);
+
+    text-align:center;
+
+}
+
+/* ---------- Кнопки ---------- */
+
+button{
+
+    width:100%;
+
+    padding:16px;
+
+    margin-top:20px;
+
+    border:none;
+
+    border-radius:15px;
+
+    font-size:18px;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+button:hover{
+
+    transform:scale(1.03);
+
+}
+
+h1{
+
+    margin-bottom:20px;
+
+}
+
+p{
+
+    line-height:1.6;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- ========================= -->
+
+<div id="screen1" class="screen active">
+
+    <div class="card">
+
+        <h1>❤️ RTM Gift ❤️</h1>
+
+        <p>
+
+            Добро пожаловать.
+
+            <br><br>
+
+            Сегодня тебя ждёт небольшое приключение.
+
+        </p>
+
+        <button onclick="changeScreen('screen2')">
+
+            Начать
+
+        </button>
+
+    </div>
+
+</div>
+
+<!-- ========================= -->
+
+<div id="screen2" class="screen">
+
+    <div class="card">
+
+        <h1>🎁 Первый экран</h1>
+
+        <p>
+
+            Если ты это читаешь,
+
+            значит переход работает 😄
+
+        </p>
+
+    </div>
+
+</div>
+
+<script>
+
+function changeScreen(next){
+
+    const current=document.querySelector(".screen.active");
+
+    current.classList.remove("active");
+
+    document.getElementById(next).classList.add("active");
+
+}
+
+</script>
+
+</body>
+
+</html>
