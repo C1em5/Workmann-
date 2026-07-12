@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#ffe3b9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
+<title>Твой квест</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   ДИЗАЙН-ТОКЕНЫ
+   ========================================================= */
+:root{
+  --bg-deep:#ffe3b9;
+  --bg-panel:#fffaf1;
+  --bg-panel-2:#fff2dc;
+  --line:#e6c393;
+  --gold:#9c5f28;
+  --gold-soft:#7a4a1e;
+  --cream:#3a2a1a;
+  --rose:#c9694f;
+  --muted:#8a7256;
+  --error:#b8433c;
+  --success:#3f8f66;
+  --font-display:'Cormorant Garamond', serif;
+  --font-body:'Inter', sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+html,body{height:100%;}
+
+body{
+  font-family:var(--font-body);
+  background:
+    radial-gradient(ellipse at 20% 10%, rgba(156,95,40,.10), transparent 45%),
+    radial-gradient(ellipse at 80% 85%, rgba(201,105,79,.10), transparent 50%),
+    var(--bg-deep);
+  color:var(--cream);
+  min-height:100vh;
+  min-height:100dvh;
+  overflow-x:hidden;
+  position:relative;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-font-smoothing:antialiased;
+  overscroll-behavior-y:none;
+}
+
+/* мерцающие звёзды на фоне */
+.stars{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+}
+.stars span{
+  position:absolute;
+  width:3px;height:3px;
+  background:#fffaf1;
+  border-radius:50%;
+  opacity:.5;
+  box-shadow:0 0 6px rgba(255,250,241,.9);
+  animation:twinkle 4s ease-in-out infinite;
+}
+@keyframes twinkle{
+  0%,100%{opacity:.2;}
+  50%{opacity:.95;}
+}
+
+/* =========================================================
+   ЛЭЙАУТ / ЭКРАНЫ
+   ========================================================= */
+.stage{
+  position:relative;
+  z-index:1;
+  min-height:100vh;
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:calc(32px + env(safe-area-inset-top)) calc(18px + env(safe-area-inset-right))
+          calc(32px + env(safe-area-inset-bottom)) calc(18px + env(safe-area-inset-left));
+}
+
+.screen{
+  width:100%;
+  max-width:460px;
+  display:none;
+  opacity:0;
+  transform:translateY(14px);
+  transition:opacity .5s ease, transform .5s ease;
+}
+.screen.active{
+  display:block;
+  opacity:1;
+  transform:translateY(0);
+}
+
+.card{
+  background:linear-gradient(180deg, var(--bg-panel), var(--bg-panel-2));
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:38px 30px;
+  text-align:center;
+  box-shadow:0 25px 60px rgba(156,95,40,.22);
+}
+
+.eyebrow{
+  font-family:var(--font-body);
+  font-size:12px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:10px;
+}
+
+h1{
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:32px;
+  line-height:1.2;
+  margin-bottom:16px;
+  color:var(--cream);
+}
+
+p{
+  font-size:15px;
+  line-height:1.65;
+  color:var(--muted);
+}
+
+.lead{
+  color:var(--cream);
+  font-size:16px;
+  margin-bottom:22px;
+}
+
+/* прогресс-созвездие */
+.constellation{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  margin-bottom:28px;
+}
+.constellation .node{
+  width:9px;height:9px;
+  border-radius:50%;
+  background:var(--line);
+  transition:background .4s ease, box-shadow .4s ease;
+}
+.constellation .node.done{
+  background:var(--gold);
+  box-shadow:0 0 10px rgba(156,95,40,.55);
+}
+.constellation .link{
+  width:22px;height:1px;
+  background:var(--line);
+  transition:background .4s ease;
+}
+.constellation .link.done{
+  background:var(--gold);
+}
+
+/* инпуты */
+.field{
+  margin-top:22px;
+  text-align:left;
+}
+label{
+  display:block;
+  font-size:12px;
+  letter-spacing:.05em;
+  color:var(--muted);
+  margin-bottom:8px;
+  text-transform:uppercase;
+}
+input[type=text]{
+  width:100%;
+  padding:14px 16px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:rgba(156,95,40,.06);
+  color:var(--cream);
+  font-family:var(--font-body);
+  font-size:16px;
+  letter-spacing:.04em;
+  outline:none;
+  -webkit-appearance:none;
+  appearance:none;
+  touch-action:manipulation;
+  transition:border-color .2s ease, box-shadow .2s ease;
+}
+input[type=text]:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(156,95,40,.18);
+}
+input[type=text].shake{
+  animation:shake .4s ease;
+  border-color:var(--error);
+}
+@keyframes shake{
+  0%,100%{transform:translateX(0);}
+  25%{transform:translateX(-6px);}
+  75%{transform:translateX(6px);}
+}
+
+.hint-error{
+  margin-top:10px;
+  font-size:13px;
+  color:var(--error);
+  min-height:16px;
+}
+
+button{
+  width:100%;
+  padding:15px;
+  margin-top:22px;
+  border:none;
+  border-radius:12px;
+  font-family:var(--font-body);
+  font-weight:600;
+  font-size:15px;
+  letter-spacing:.02em;
+  cursor:pointer;
+  -webkit-appearance:none;
+  appearance:none;
+  touch-action:manipulation;
+  background:linear-gradient(135deg, var(--gold), #b98a4a);
+  color:#1b1400;
+  transition:transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+}
+button:active{
+  transform:scale(.98);
+}
+@media (hover:hover) and (pointer:fine){
+  button:hover{
+    transform:translateY(-1px);
+    box-shadow:0 10px 24px rgba(156,95,40,.22);
+  }
+}
+button:disabled{
+  opacity:.4;
+  cursor:not-allowed;
+  transform:none;
+  box-shadow:none;
+}
+button.ghost{
+  background:transparent;
+  border:1px solid var(--line);
+  color:var(--muted);
+  font-weight:500;
+}
+@media (hover:hover) and (pointer:fine){
+  button.ghost:hover{
+    border-color:var(--gold);
+    color:var(--gold-soft);
+    box-shadow:none;
+  }
+}
+button.text-link{
+  width:auto;
+  background:none;
+  padding:6px 0;
+  margin-top:14px;
+  font-size:12px;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  color:var(--muted);
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+@media (hover:hover) and (pointer:fine){
+  button.text-link:hover{
+    color:var(--gold-soft);
+    transform:none;
+    box-shadow:none;
+  }
+}
+
+/* тест */
+.question{
+  text-align:left;
+  margin-top:22px;
+  padding-top:18px;
+  border-top:1px solid var(--line);
+}
+.question:first-of-type{
+  border-top:none;
+  padding-top:0;
+}
+.question .q-text{
+  font-family:var(--font-display);
+  font-size:19px;
+  color:var(--cream);
+  margin-bottom:12px;
+}
+.option{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:13px 14px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  margin-bottom:8px;
+  cursor:pointer;
+  touch-action:manipulation;
+  transition:border-color .2s ease, background .2s ease;
+}
+@media (hover:hover) and (pointer:fine){
+  .option:hover{
+    border-color:var(--gold);
+  }
+}
+.option input{
+  accent-color:var(--gold);
+  width:19px;
+  height:19px;
+  flex-shrink:0;
+}
+.option.selected{
+  border-color:var(--gold);
+  background:rgba(156,95,40,.10);
+}
+.option span{
+  font-size:14px;
+  color:var(--cream);
+}
+
+/* таймер */
+.timer{
+  display:flex;
+  justify-content:center;
+  gap:14px;
+  margin:26px 0 6px;
+}
+.timer .unit{
+  min-width:64px;
+}
+.timer .num{
+  font-family:var(--font-display);
+  font-size:34px;
+  color:var(--gold-soft);
+  font-variant-numeric:tabular-nums;
+}
+.timer .label{
+  font-size:10px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-top:2px;
+}
+
+.admin-toggle{
+  margin-top:26px;
+  padding-top:18px;
+  border-top:1px solid var(--line);
+}
+
+.score-badge{
+  display:inline-block;
+  margin:6px 0 18px;
+  padding:6px 16px;
+  border-radius:999px;
+  border:1px solid var(--gold);
+  color:var(--gold-soft);
+  font-size:13px;
+  letter-spacing:.04em;
+}
+
+.hidden{display:none !important;}
+
+.footnote{
+  margin-top:18px;
+  font-size:11px;
+  color:var(--line);
+}
+
+/* =========================================================
+   АДАПТАЦИЯ ПОД УЗКИЕ ЭКРАНЫ (iPhone и т.п.)
+   ========================================================= */
+@media (max-width:400px){
+  .card{
+    padding:30px 20px;
+  }
+  .stage{
+    padding-left:calc(12px + env(safe-area-inset-left));
+    padding-right:calc(12px + env(safe-area-inset-right));
+  }
+  h1{
+    font-size:27px;
+  }
+  .timer{
+    gap:8px;
+  }
+  .timer .unit{
+    min-width:52px;
+  }
+  .timer .num{
+    font-size:27px;
+  }
+}
+
+/* учитывает жестовую полосу снизу экрана */
+@supports (padding: max(0px)){
+  .stage{
+    padding-bottom:max(32px, calc(24px + env(safe-area-inset-bottom)));
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="stage">
+
+  <!-- прогресс-созвездие -->
+  <div class="constellation" id="constellation"></div>
+
+  <!-- ============ ЭКРАН 0: ВВОД КОДА №1 ============ -->
+  <div class="screen" id="screen-code1">
+    <div class="card">
+      <div class="eyebrow">Глава I</div>
+      <h1>Здесь начинается твой квест</h1>
+      <p>На открытке спрятан код. Введи его — и приключение начнётся.</p>
+      <div class="field">
+        <label for="input-code1">Код с открытки</label>
+        <input type="text" id="input-code1" autocomplete="off" placeholder="••••••">
+      </div>
+      <div class="hint-error" id="error-code1"></div>
+      <button onclick="submitCode1()">Открыть</button>
+    </div>
+  </div>
+
+  <!-- ============ ЭКРАН 1: ТЕСТ №1 ============ -->
+  <div class="screen" id="screen-quiz1">
+    <div class="card">
+      <div class="eyebrow">Глава II</div>
+      <h1>Первое испытание</h1>
+      <p class="lead">Отвечай честно — вселенная считает.</p>
+      <div id="quiz1-questions"></div>
+      <div class="hint-error" id="error-quiz1"></div>
+      <button onclick="submitQuiz('quiz1')">Ответить</button>
+    </div>
+  </div>
+
+  <!-- ============ ЭКРАН 2а: ТЕСТ №1 ПРОВАЛЕН ============ -->
+  <div class="screen" id="screen-quiz1-fail">
+    <div class="card">
+      <div class="eyebrow">Глава II · Итог</div>
+      <h1>Почти получилось</h1>
+      <div class="score-badge" id="quiz1-score-fail"></div>
+      <p>Судьба любит настойчивых. Попробуй ещё раз.</p>
+      <button onclick="retryQuiz('quiz1')">Попробовать снова</button>
+    </div>
+  </div>
+
+  <!-- ============ ЭКРАН 2б: ТЕСТ №1 ПРОЙДЕН + ВВОД КОДА №2 ============ -->
+  <div class="screen" id="screen-quiz1-success">
+    <div class="card">
+      <div class="eyebrow">Глава III</div>
+      <h1>Ты справилась ✨</h1>
+      <div class="score-badge" id="quiz1-score-success"></div>
+      <p id="gift1-text">Первый подарок уже твой. Загляни в [СЮДА ОПИСАНИЕ ПЕРВОГО ПОДАРКА].</p>
+      <div class="field">
+        <label for="input-code2">Хочешь узнать, что дальше? Введи второй код</label>
+        <input type="text" id="input-code2" autocomplete="off" placeholder="••••••">
+      </div>
+      <div class="hint-error" id="error-code2"></div>
+      <button onclick="submitCode2()">Продолжить</button>
+    </div>
+  </div>
+
+  <!-- ============ ЭКРАН 3: БЛОКИРОВКА / ТАЙМЕР ============ -->
+  <div class="screen" id="screen-lock">
+    <div class="card">
+      <div class="eyebrow">Глава IV</div>
+      <h1>Второй подарок ждёт своего часа</h1>
+      <p>Время — тоже часть подарка. Возвращайся, когда звёзды сойдутся:</p>
+      <div class="timer" id="timer">
+        <div class="unit"><div class="num" id="t-days">00</div><div class="label">дней</div></div>
+        <div class="unit"><div class="num" id="t-hours">00</div><div class="label">часов</div></div>
+        <div class="unit"><div class="num" id="t-min">00</div><div class="label">минут</div></div>
+        <div class="unit"><div class="num" id="t-sec">00</div><div class="label">секунд</div></div>
+      </div>
+      <div class="admin-toggle">
+        <button class="text-link" onclick="toggleAdminField()">У меня есть особый код</button>
+        <div id="admin-field" class="hidden">
+          <div class="field">
+            <input type="text" id="input-admin" autocomplete="off" placeholder="Особый код">
+          </div>
+          <div class="hint-error" id="error-admin"></div>
+          <button class="ghost" onclick="submitAdmin()">Снять блокировку</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ЭКРАН 4: ТЕСТ №2 ============ -->
+  <div class="screen" id="screen-quiz2">
+    <div class="card">
+      <div class="eyebrow">Глава V</div>
+      <h1>Финальное испытание</h1>
+      <p class="lead">Последний шаг перед финалом.</p>
+      <div id="quiz2-questions"></div>
+      <div class="hint-error" id="error-quiz2"></div>
+      <button onclick="submitQuiz('quiz2')">Ответить</button>
+    </div>
+  </div>
+
+  <!-- ============ ЭКРАН 4а: ТЕСТ №2 ПРОВАЛЕН ============ -->
+  <div class="screen" id="screen-quiz2-fail">
+    <div class="card">
+      <div class="eyebrow">Глава V · Итог</div>
+      <h1>Ещё чуть-чуть</h1>
+      <div class="score-badge" id="quiz2-score-fail"></div>
+      <p>Финал уже так близко. Попробуй снова.</p>
+      <button onclick="retryQuiz('quiz2')">Попробовать снова</button>
+    </div>
+  </div>
+
+  <!-- ============ ЭКРАН 5: ФИНАЛ ============ -->
+  <div class="screen" id="screen-final">
+    <div class="card">
+      <div class="eyebrow">Финал</div>
+      <h1>С юбилеем, любовь моя 🤍</h1>
+      <div class="score-badge" id="quiz2-score-final"></div>
+      <p id="gift2-text">[СЮДА ОПИСАНИЕ ВТОРОГО ПОДАРКА — что она получает и где его найти]</p>
+      <p class="footnote">Квест пройден полностью.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* =========================================================
+   CONFIG — РЕДАКТИРУЙ ТОЛЬКО ЭТОТ БЛОК
+   ========================================================= */
+const CONFIG = {
+
+  // Коды доступа (регистр не важен, пробелы по краям обрезаются)
+  CODE1: "СЕРДЦЕ",
+  CODE2: "ЛЮБОВЬ",
+  ADMIN_CODE: "МАСТЕРКЛЮЧ",
+
+  // Порог прохождения теста (0.7 = 70%)
+  PASS_THRESHOLD: 0.7,
+
+  // На сколько дней блокируется второй тест после ввода второго кода
+  LOCK_DAYS: 30,
+
+  // Текст первого подарка (показывается сразу после теста №1)
+  GIFT1_TEXT: "Первый подарок уже твой. Загляни в [СЮДА ОПИСАНИЕ ПЕРВОГО ПОДАРКА].",
+
+  // Текст финального подарка
+  GIFT2_TEXT: "[СЮДА ОПИСАНИЕ ВТОРОГО ПОДАРКА — что она получает и где его найти]",
+
+  // ---- Тест №1 ----
+  // correct — индекс правильного варианта (считая с 0)
+  QUIZ1: [
+    {
+      q: "В каком городе мы познакомились?",
+      options: ["ПЛЕЙСХОЛДЕР A", "ПЛЕЙСХОЛДЕР B", "ПЛЕЙСХОЛДЕР C", "ПЛЕЙСХОЛДЕР D"],
+      correct: 0
+    },
+    {
+      q: "Сколько лет мы вместе в этом году?",
+      options: ["1", "2", "3", "4"],
+      correct: 2
+    },
+    {
+      q: "Наше первое совместное путешествие было в...",
+      options: ["ПЛЕЙСХОЛДЕР A", "ПЛЕЙСХОЛДЕР B", "ПЛЕЙСХОЛДЕР C", "ПЛЕЙСХОЛДЕР D"],
+      correct: 1
+    },
+    {
+      q: "Моё любимое блюдо, которое ты готовишь?",
+      options: ["ПЛЕЙСХОЛДЕР A", "ПЛЕЙСХОЛДЕР B", "ПЛЕЙСХОЛДЕР C", "ПЛЕЙСХОЛДЕР D"],
+      correct: 3
+    },
+    {
+      q: "Как называется наша первая общая песня?",
+      options: ["ПЛЕЙСХОЛДЕР A", "ПЛЕЙСХОЛДЕР B", "ПЛЕЙСХОЛДЕР C", "ПЛЕЙСХОЛДЕР D"],
+      correct: 0
+    }
+  ],
+
+  // ---- Тест №2 ----
+  QUIZ2: [
+    {
+      q: "О чём я мечтаю больше всего в ближайший год?",
+      options: ["ПЛЕЙСХОЛДЕР A", "ПЛЕЙСХОЛДЕР B", "ПЛЕЙСХОЛДЕР C", "ПЛЕЙСХОЛДЕР D"],
+      correct: 1
+    },
+    {
+      q: "Какой наш самый смешной момент вместе?",
+      options: ["ПЛЕЙСХОЛДЕР A", "ПЛЕЙСХОЛДЕР B", "ПЛЕЙСХОЛДЕР C", "ПЛЕЙСХОЛДЕР D"],
+      correct: 2
+    },
+    {
+      q: "Где бы я хотел(а) сделать тебе предложение / встретить важное событие?",
+      options: ["ПЛЕЙСХОЛДЕР A", "ПЛЕЙСХОЛДЕР B", "ПЛЕЙСХОЛДЕР C", "ПЛЕЙСХОЛДЕР D"],
+      correct: 0
+    }
+  ]
+};
+
+/* =========================================================
+   СТАРТ — ЗВЁЗДНЫЙ ФОН
+   ========================================================= */
+(function initStars(){
+  const wrap = document.getElementById('stars');
+  const count = window.innerWidth < 500 ? 40 : 70;
+  for(let i=0;i<count;i++){
+    const s = document.createElement('span');
+    s.style.left = Math.random()*100 + '%';
+    s.style.top = Math.random()*100 + '%';
+    s.style.animationDelay = (Math.random()*4) + 's';
+    wrap.appendChild(s);
+  }
+})();
+
+/* =========================================================
+   СОСТОЯНИЕ (сохраняется в localStorage — переживает
+   закрытие вкладки, перезагрузку, недели ожидания)
+   ========================================================= */
+const STORAGE_KEY = 'rtm_gift_state_v1';
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultState();
+    return Object.assign(defaultState(), JSON.parse(raw));
+  }catch(e){
+    return defaultState();
+  }
+}
+function defaultState(){
+  return {
+    code1Verified:false,
+    quiz1Passed:false,
+    quiz1LastScore:null,
+    code2Verified:false,
+    unlockTimestamp:null,
+    adminOverride:false,
+    quiz2Passed:false,
+    quiz2LastScore:null
+  };
+}
+function saveState(state){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+let state = loadState();
+
+/* =========================================================
+   НАВИГАЦИЯ / РЕНДЕР ЭКРАНОВ
+   ========================================================= */
+const SCREENS = ['screen-code1','screen-quiz1','screen-quiz1-fail','screen-quiz1-success',
+                  'screen-lock','screen-quiz2','screen-quiz2-fail','screen-final'];
+
+function showScreen(id){
+  SCREENS.forEach(s=>{
+    document.getElementById(s).classList.remove('active');
+  });
+  document.getElementById(id).classList.add('active');
+}
+
+function stageIndex(){
+  if(!state.code1Verified) return 0;
+  if(!state.quiz1Passed) return 1;
+  if(!state.code2Verified) return 2;
+  if(!isUnlocked()) return 3;
+  if(!state.quiz2Passed) return 4;
+  return 5;
+}
+
+function renderConstellation(){
+  const total = 5; // code1, quiz1, code2, timer, quiz2/final
+  const done = stageIndex();
+  const el = document.getElementById('constellation');
+  el.innerHTML = '';
+  for(let i=0;i<total;i++){
+    const node = document.createElement('div');
+    node.className = 'node' + (i < done ? ' done' : (i===done ? ' done' : ''));
+    el.appendChild(node);
+    if(i < total-1){
+      const link = document.createElement('div');
+      link.className = 'link' + (i < done ? ' done' : '');
+      el.appendChild(link);
+    }
+  }
+}
+
+function isUnlocked(){
+  if(state.adminOverride) return true;
+  if(!state.unlockTimestamp) return false;
+  return Date.now() >= state.unlockTimestamp;
+}
+
+function render(){
+  renderConstellation();
+  const idx = stageIndex();
+  if(idx === 0){
+    showScreen('screen-code1');
+  } else if(idx === 1){
+    buildQuiz('quiz1', CONFIG.QUIZ1, 'quiz1-questions');
+    showScreen('screen-quiz1');
+  } else if(idx === 2){
+    document.getElementById('quiz1-score-success').textContent =
+      'Результат: ' + Math.round(state.quiz1LastScore*100) + '%';
+    document.getElementById('gift1-text').textContent = CONFIG.GIFT1_TEXT;
+    showScreen('screen-quiz1-success');
+  } else if(idx === 3){
+    showScreen('screen-lock');
+    startTimerLoop();
+  } else if(idx === 4){
+    buildQuiz('quiz2', CONFIG.QUIZ2, 'quiz2-questions');
+    showScreen('screen-quiz2');
+  } else if(idx === 5){
+    document.getElementById('quiz2-score-final').textContent =
+      'Результат: ' + Math.round(state.quiz2LastScore*100) + '%';
+    document.getElementById('gift2-text').textContent = CONFIG.GIFT2_TEXT;
+    showScreen('screen-final');
+  }
+}
+
+/* =========================================================
+   КОД №1
+   ========================================================= */
+function normalize(v){
+  return (v||'').trim().toLowerCase();
+}
+
+function submitCode1(){
+  const input = document.getElementById('input-code1');
+  const errorEl = document.getElementById('error-code1');
+  if(normalize(input.value) === normalize(CONFIG.CODE1)){
+    state.code1Verified = true;
+    saveState(state);
+    errorEl.textContent = '';
+    render();
+  } else {
+    errorEl.textContent = 'Неверный код. Попробуй ещё раз.';
+    input.classList.remove('shake');
+    void input.offsetWidth;
+    input.classList.add('shake');
+  }
+}
+
+/* =========================================================
+   КОД №2
+   ========================================================= */
+function submitCode2(){
+  const input = document.getElementById('input-code2');
+  const errorEl = document.getElementById('error-code2');
+  if(normalize(input.value) === normalize(CONFIG.CODE2)){
+    state.code2Verified = true;
+    if(!state.unlockTimestamp){
+      state.unlockTimestamp = Date.now() + CONFIG.LOCK_DAYS*24*60*60*1000;
+    }
+    saveState(state);
+    errorEl.textContent = '';
+    render();
+  } else {
+    errorEl.textContent = 'Неверный код. Попробуй ещё раз.';
+    input.classList.remove('shake');
+    void input.offsetWidth;
+    input.classList.add('shake');
+  }
+}
+
+/* =========================================================
+   ТЕСТЫ (общий рендерер для quiz1 и quiz2)
+   ========================================================= */
+function buildQuiz(key, questions, containerId){
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  questions.forEach((item, qi)=>{
+    const qDiv = document.createElement('div');
+    qDiv.className = 'question';
+    const qText = document.createElement('div');
+    qText.className = 'q-text';
+    qText.textContent = (qi+1) + '. ' + item.q;
+    qDiv.appendChild(qText);
+
+    item.options.forEach((opt, oi)=>{
+      const label = document.createElement('label');
+      label.className = 'option';
+      label.innerHTML =
+        '<input type="radio" name="'+key+'-q'+qi+'" value="'+oi+'"> <span>'+opt+'</span>';
+      label.querySelector('input').addEventListener('change', ()=>{
+        qDiv.querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));
+        label.classList.add('selected');
+      });
+      qDiv.appendChild(label);
+    });
+
+    container.appendChild(qDiv);
+  });
+}
+
+function submitQuiz(key){
+  const questions = key === 'quiz1' ? CONFIG.QUIZ1 : CONFIG.QUIZ2;
+  const errorId = key === 'quiz1' ? 'error-quiz1' : 'error-quiz2';
+  const errorEl = document.getElementById(errorId);
+
+  let answeredAll = true;
+  let correctCount = 0;
+
+  questions.forEach((item, qi)=>{
+    const checked = document.querySelector('input[name="'+key+'-q'+qi+'"]:checked');
+    if(!checked){
+      answeredAll = false;
+      return;
+    }
+    if(parseInt(checked.value,10) === item.correct){
+      correctCount++;
+    }
+  });
+
+  if(!answeredAll){
+    errorEl.textContent = 'Ответь на все вопросы, прежде чем продолжить.';
+    return;
+  }
+  errorEl.textContent = '';
+
+  const score = correctCount / questions.length;
+  const passed = score >= CONFIG.PASS_THRESHOLD;
+
+  if(key === 'quiz1'){
+    state.quiz1LastScore = score;
+    if(passed){
+      state.quiz1Passed = true;
+      saveState(state);
+      render();
+    } else {
+      saveState(state);
+      document.getElementById('quiz1-score-fail').textContent =
+        'Результат: ' + Math.round(score*100) + '%  (нужно ' + Math.round(CONFIG.PASS_THRESHOLD*100) + '%)';
+      showScreen('screen-quiz1-fail');
+    }
+  } else {
+    state.quiz2LastScore = score;
+    if(passed){
+      state.quiz2Passed = true;
+      saveState(state);
+      render();
+    } else {
+      saveState(state);
+      document.getElementById('quiz2-score-fail').textContent =
+        'Результат: ' + Math.round(score*100) + '%  (нужно ' + Math.round(CONFIG.PASS_THRESHOLD*100) + '%)';
+      showScreen('screen-quiz2-fail');
+    }
+  }
+}
+
+function retryQuiz(key){
+  if(key === 'quiz1'){
+    buildQuiz('quiz1', CONFIG.QUIZ1, 'quiz1-questions');
+    showScreen('screen-quiz1');
+  } else {
+    buildQuiz('quiz2', CONFIG.QUIZ2, 'quiz2-questions');
+    showScreen('screen-quiz2');
+  }
+}
+
+/* =========================================================
+   ТАЙМЕР БЛОКИРОВКИ
+   ========================================================= */
+let timerInterval = null;
+
+function startTimerLoop(){
+  if(timerInterval) clearInterval(timerInterval);
+  updateTimer();
+  timerInterval = setInterval(()=>{
+    updateTimer();
+    if(isUnlocked()){
+      clearInterval(timerInterval);
+      render();
+    }
+  }, 1000);
+}
+
+function updateTimer(){
+  const remaining = Math.max(0, state.unlockTimestamp - Date.now());
+  const days = Math.floor(remaining / 86400000);
+  const hours = Math.floor((remaining % 86400000) / 3600000);
+  const mins = Math.floor((remaining % 3600000) / 60000);
+  const secs = Math.floor((remaining % 60000) / 1000);
+  document.getElementById('t-days').textContent = String(days).padStart(2,'0');
+  document.getElementById('t-hours').textContent = String(hours).padStart(2,'0');
+  document.getElementById('t-min').textContent = String(mins).padStart(2,'0');
+  document.getElementById('t-sec').textContent = String(secs).padStart(2,'0');
+}
+
+/* =========================================================
+   АДМИН-КОД (снимает блокировку таймера)
+   ========================================================= */
+function toggleAdminField(){
+  document.getElementById('admin-field').classList.toggle('hidden');
+}
+
+function submitAdmin(){
+  const input = document.getElementById('input-admin');
+  const errorEl = document.getElementById('error-admin');
+  if(normalize(input.value) === normalize(CONFIG.ADMIN_CODE)){
+    state.adminOverride = true;
+    saveState(state);
+    if(timerInterval) clearInterval(timerInterval);
+    errorEl.textContent = '';
+    render();
+  } else {
+    errorEl.textContent = 'Неверный код.';
+  }
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+render();
+
+// Позволяет отправлять форму по Enter
+document.addEventListener('keydown', (e)=>{
+  if(e.key !== 'Enter') return;
+  const active = document.activeElement;
+  if(active && active.tagName === 'INPUT'){
+    if(active.id === 'input-code1') submitCode1();
+    if(active.id === 'input-code2') submitCode2();
+    if(active.id === 'input-admin') submitAdmin();
+  }
+});
+</script>
+</body>
+</html>
