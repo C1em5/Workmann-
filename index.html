@@ -177,11 +177,25 @@ p{
 
 function changeScreen(next){
 
-    const current=document.querySelector(".screen.active");
+    const current = document.querySelector(".screen.active");
+    const nextScreen = document.getElementById(next);
 
+    current.classList.add("exit-left");
     current.classList.remove("active");
 
-    document.getElementById(next).classList.add("active");
+    nextScreen.classList.add("enter-right");
+
+    setTimeout(() => {
+        nextScreen.classList.add("active");
+    },20);
+
+    setTimeout(() => {
+
+        current.classList.remove("exit-left");
+
+        nextScreen.classList.remove("enter-right");
+
+    },700);
 
 }
 
