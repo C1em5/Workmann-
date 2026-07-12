@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#ffe3b9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
+<title>RTM GIFT ENT</title>
+<link rel="icon" type="image/png" href="d0cc9608-f3a8-438e-83e6-d7ee3111d599-removebg-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   ДИЗАЙН-ТОКЕНЫ
+   ========================================================= */
+:root{
+  --bg-deep:#ffe3b9;
+  --bg-panel:#fffaf1;
+  --bg-panel-2:#fff2dc;
+  --line:#e6c393;
+  --gold:#9c5f28;
+  --gold-soft:#7a4a1e;
+  --cream:#3a2a1a;
+  --rose:#c9694f;
+  --muted:#8a7256;
+  --error:#b8433c;
+  --success:#3f8f66;
+  --font-display:'Cormorant Garamond', serif;
+  --font-body:'Inter', sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+html,body{height:100%;}
+
+body{
+  font-family:var(--font-body);
+  background:
+    radial-gradient(ellipse at 20% 10%, rgba(156,95,40,.10), transparent 45%),
+    radial-gradient(ellipse at 80% 85%, rgba(201,105,79,.10), transparent 50%),
+    var(--bg-deep);
+  color:var(--cream);
+  min-height:100vh;
+  min-height:100dvh;
+  overflow-x:hidden;
+  position:relative;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-font-smoothing:antialiased;
+  overscroll-behavior-y:none;
+}
+
+/* мерцающие звёзды на фоне */
+.stars{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+}
+.stars span{
+  position:absolute;
+  width:5px;height:5px;
+  background:#fffaf1;
+  border-radius:50%;
+  opacity:.5;
+  box-shadow:0 0 6px rgba(255,250,241,.9);
+  animation:twinkle 7s ease-in-out infinite;
+}
+@keyframes twinkle{
+  0%,100%{opacity:.2;}
+  50%{opacity:.95;}
+}
+
+/* =========================================================
+   ЛЭЙАУТ / ЭКРАНЫ
+   ========================================================= */
+.stage{
+  position:relative;
+  z-index:1;
+  min-height:100vh;
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:calc(32px + env(safe-area-inset-top)) calc(18px + env(safe-area-inset-right))
+          calc(32px + env(safe-area-inset-bottom)) calc(18px + env(safe-area-inset-left));
+}
+
+.screen{
+  width:100%;
+  max-width:460px;
+  display:none;
+  opacity:0;
+  transform:translateY(14px);
+  transition:opacity .5s ease, transform .5s ease;
+}
+.screen.active{
+  display:block;
+  opacity:1;
+  transform:translateY(0);
+}
+
+.card{
+  background:linear-gradient(180deg, var(--bg-panel), var(--bg-panel-2));
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:38px 30px;
+  text-align:center;
+  box-shadow:0 25px 60px rgba(156,95,40,.22);
+}
+
+.eyebrow{
+  font-family:var(--font-body);
+  font-size:12px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:10px;
+}
+
+h1{
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:32px;
+  line-height:1.2;
+  margin-bottom:16px;
+  color:var(--cream);
+}
+
+p{
+  font-size:15px;
+  line-height:1.65;
+  color:var(--muted);
+}
+
+.lead{
+  color:var(--cream);
+  font-size:16px;
+  margin-bottom:22px;
+}
+
+/* прогресс-созвездие */
+.constellation{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  margin-bottom:28px;
+}
+.constellation .node{
+  width:9px;height:9px;
+  border-radius:50%;
+  background:var(--line);
+  transition:background .4s ease, box-shadow .4s ease;
+}
+.constellation .node.done{
+  background:var(--gold);
+  box-shadow:0 0 10px rgba(156,95,40,.55);
+}
+.constellation .link{
+  width:22px;height:1px;
+  background:var(--line);
+  transition:background .4s ease;
+}
+.constellation .link.done{
+  background:var(--gold);
+}
+
+/* инпуты */
+.field{
+  margin-top:22px;
+  text-align:left;
+}
+label{
+  display:block;
+  font-size:12px;
+  letter-spacing:.05em;
+  color:var(--muted);
+  margin-bottom:8px;
+  text-transform:uppercase;
+}
+input[type=text]{
+  width:100%;
+  padding:14px 16px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:rgba(156,95,40,.06);
+  color:var(--cream);
+  font-family:var(--font-body);
+  font-size:16px;
+  letter-spacing:.04em;
+  outline:none;
+  -webkit-appearance:none;
+  appearance:none;
+  touch-action:manipulation;
+  transition:border-color .2s ease, box-shadow .2s ease;
+}
+input[type=text]:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(156,95,40,.18);
+}
+input[type=text].shake{
+  animation:shake .4s ease;
+  border-color:var(--error);
+}
+@keyframes shake{
+  0%,100%{transform:translateX(0);}
+  25%{transform:translateX(-6px);}
+  75%{transform:translateX(6px);}
+}
+
+.hint-error{
+  margin-top:10px;
+  font-size:13px;
+  color:var(--error);
+  min-height:16px;
+}
+
+button{
+  width:100%;
+  padding:15px;
+  margin-top:22px;
+  border:none;
+  border-radius:12px;
+  font-family:var(--font-body);
+  font-weight:600;
+  font-size:15px;
+  letter-spacing:.02em;
+  cursor:pointer;
+  -webkit-appearance:none;
+  appearance:none;
+  touch-action:manipulation;
+  background:linear-gradient(135deg, var(--gold), #b98a4a);
+  color:#1b1400;
+  transition:transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+}
+button:active{
+  transform:scale(.98);
+}
+@media (hover:hover) and (pointer:fine){
+  button:hover{
+    transform:translateY(-1px);
+    box-shadow:0 10px 24px rgba(156,95,40,.22);
+  }
+}
+button:disabled{
+  opacity:.4;
+  cursor:not-allowed;
+  transform:none;
+  box-shadow:none;
+}
+button.ghost{
+  background:transparent;
+  border:1px solid var(--line);
+  color:var(--muted);
+  font-weight:500;
+}
+@media (hover:hover) and (pointer:fine){
+  button.ghost:hover{
+    border-color:var(--gold);
+    color:var(--gold-soft);
+    box-shadow:none;
+  }
+}
+button.text-link{
+  width:auto;
+  background:none;
+  padding:6px 0;
+  margin-top:14px;
+  font-size:12px;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  color:var(--muted);
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+@media (hover:hover) and (pointer:fine){
+  button.text-link:hover{
+    color:var(--gold-soft);
+    transform:none;
+    box-shadow:none;
+  }
+}
+
+/* тест */
+.question{
+  text-align:left;
+  margin-top:22px;
+  padding-top:18px;
+  border-top:1px solid var(--line);
+}
+.question:first-of-type{
+  border-top:none;
+  padding-top:0;
+}
+.question .q-text{
+  font-family:var(--font-display);
+  font-size:19px;
+  color:var(--cream);
+  margin-bottom:12px;
+}
+.option{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:13px 14px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  margin-bottom:8px;
+  cursor:pointer;
+  touch-action:manipulation;
+  transition:border-color .2s ease, background .2s ease;
+}
+@media (hover:hover) and (pointer:fine){
+  .option:hover{
+    border-color:var(--gold);
+  }
+}
+.option input{
+  accent-color:var(--gold);
+  width:19px;
+  height:19px;
+  flex-shrink:0;
+}
+.option.selected{
+  border-color:var(--gold);
+  background:rgba(156,95,40,.10);
+}
+.option span{
+  font-size:14px;
+  color:var(--cream);
+}
+
+/* таймер */
+.timer{
+  display:flex;
+  justify-content:center;
+  gap:14px;
+  margin:26px 0 6px;
+}
+.timer .unit{
+  min-width:64px;
+}
+.timer .num{
+  font-family:var(--font-display);
+  font-size:34px;
+  color:var(--gold-soft);
+  font-variant-numeric:tabular-nums;
+}
+.timer .label{
+  font-size:10px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-top:2px;
+}
+
+.admin-toggle{
+  margin-top:26px;
+  padding-top:18px;
+  border-top:1px solid var(--line);
+}
+
+.score-badge{
+  display:inline-block;
+  margin:6px 0 18px;
+  padding:6px 16px;
+  border-radius:999px;
+  border:1px solid var(--gold);
+  color:var(--gold-soft);
+  font-size:13px;
+  letter-spacing:.04em;
+}
+
+.hidden{display:none !important;}
+
+.footnote{
+  margin-top:18px;
+  font-size:11px;
+  color:var(--line);
+}
+
+/* =========================================================
+   АЧИВКИ
+   ========================================================= */
+.achv-counter{
+  position:fixed;
+  top:calc(14px + env(safe-area-inset-top));
+  right:14px;
+  z-index:5;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:7px 13px;
+  border-radius:999px;
+  background:rgba(255,250,241,.75);
+  border:1px solid var(--line);
+  backdrop-filter:blur(6px);
+  font-size:12px;
+  letter-spacing:.03em;
+  color:var(--gold-soft);
+  font-weight:600;
+  box-shadow:0 6px 18px rgba(156,95,40,.14);
+  opacity:0;
+  transform:translateY(-6px);
+  transition:opacity .4s ease, transform .4s ease;
+}
+.achv-counter.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+.achv-overlay{
+  position:fixed;
+  inset:0;
+  z-index:50;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px calc(20px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left));
+  background:rgba(20,12,4,.6);
+  backdrop-filter:blur(4px);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .4s ease;
+}
+.achv-overlay.active{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.achv-card{
+  width:100%;
+  max-width:360px;
+  background:linear-gradient(180deg, var(--bg-panel), var(--bg-panel-2));
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:24px 22px 28px;
+  text-align:center;
+  box-shadow:0 35px 80px rgba(0,0,0,.4);
+  transform:scale(.35) translateY(70px) rotate(-8deg);
+  opacity:0;
+  transition:transform .65s cubic-bezier(.34,1.56,.64,1), opacity .5s ease;
+  max-height:88vh;
+  overflow-y:auto;
+}
+.achv-overlay.active .achv-card{
+  transform:scale(1) translateY(0) rotate(0deg);
+  opacity:1;
+}
+
+.achv-photo-wrap{
+  width:100%;
+  border-radius:16px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  margin-bottom:16px;
+  box-shadow:0 14px 34px rgba(156,95,40,.28);
+  transform:scale(1.08);
+  animation:achvPhotoIn .7s cubic-bezier(.34,1.56,.64,1) .15s both;
+}
+@keyframes achvPhotoIn{
+  0%{transform:scale(1.3); filter:brightness(1.4);}
+  100%{transform:scale(1); filter:brightness(1);}
+}
+.achv-photo-wrap img{
+  width:100%;
+  display:block;
+}
+
+.achv-icon{
+  font-size:46px;
+  margin-bottom:10px;
+  animation:achvPop .7s cubic-bezier(.34,1.56,.64,1) .15s both;
+}
+@keyframes achvPop{
+  0%{transform:scale(0) rotate(-25deg); opacity:0;}
+  60%{transform:scale(1.25) rotate(10deg); opacity:1;}
+  100%{transform:scale(1) rotate(0); opacity:1;}
+}
+
+.achv-eyebrow{
+  font-size:11px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:8px;
+}
+.achv-title{
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:24px;
+  color:var(--cream);
+  margin-bottom:10px;
+}
+.achv-desc{
+  font-size:14px;
+  line-height:1.6;
+  color:var(--muted);
+  margin-bottom:4px;
+}
+.achv-card button{
+  margin-top:20px;
+}
+
+.achv-counter{
+  cursor:pointer;
+  touch-action:manipulation;
+}
+@media (hover:hover) and (pointer:fine){
+  .achv-counter:hover{
+    border-color:var(--gold);
+  }
+}
+
+.achv-gallery-card{
+  width:100%;
+  max-width:400px;
+  background:linear-gradient(180deg, var(--bg-panel), var(--bg-panel-2));
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:26px 22px 22px;
+  text-align:left;
+  box-shadow:0 35px 80px rgba(0,0,0,.4);
+  transform:scale(.9) translateY(20px);
+  opacity:0;
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1), opacity .35s ease;
+  max-height:85vh;
+  overflow-y:auto;
+}
+.achv-overlay.active .achv-gallery-card{
+  transform:scale(1) translateY(0);
+  opacity:1;
+}
+.achv-gallery-head{
+  text-align:center;
+  margin-bottom:18px;
+}
+.achv-gallery-head .achv-eyebrow{
+  margin-bottom:6px;
+}
+.achv-gallery-head h2{
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:24px;
+  color:var(--cream);
+}
+.achv-gallery-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.achv-row{
+  display:flex;
+  align-items:center;
+  gap:13px;
+  padding:12px 13px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:rgba(156,95,40,.05);
+}
+.achv-row.locked{
+  opacity:.5;
+}
+.achv-row-media{
+  width:46px;
+  height:46px;
+  border-radius:12px;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  background:rgba(156,95,40,.10);
+  border:1px solid var(--line);
+  overflow:hidden;
+}
+.achv-row-media img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.achv-row-text{
+  flex:1;
+  min-width:0;
+}
+.achv-row-title{
+  font-size:14px;
+  font-weight:600;
+  color:var(--cream);
+  margin-bottom:2px;
+}
+.achv-row-desc{
+  font-size:12px;
+  line-height:1.4;
+  color:var(--muted);
+}
+.achv-row-check{
+  font-size:16px;
+  flex-shrink:0;
+}
+.achv-gallery-card button{
+  margin-top:20px;
+}
+
+/* =========================================================
+   АДАПТАЦИЯ ПОД УЗКИЕ ЭКРАНЫ (iPhone и т.п.)
+   ========================================================= */
+@media (max-width:400px){
+  .card{
+    padding:30px 20px;
+  }
+  .stage{
+    padding-left:calc(12px + env(safe-area-inset-left));
+    padding-right:calc(12px + env(safe-area-inset-right));
+  }
+  h1{
+    font-size:27px;
+  }
+  .timer{
+    gap:8px;
+  }
+  .timer .unit{
+    min-width:52px;
+  }
+  .timer .num{
+    font-size:27px;
+  }
+}
+
+/* учитывает жестовую полосу снизу экрана */
+@supports (padding: max(0px)){
+  .stage{
+    padding-bottom:max(32px, calc(24px + env(safe-area-inset-bottom)));
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="achv-counter" id="achv-counter" onclick="openAchvGallery()">🏆 <span id="achv-counter-text">0/4</span></div>
+
+<div class="achv-overlay" id="achv-overlay">
+  <div class="achv-card">
+    <div class="achv-eyebrow">Ачивка получена</div>
+    <div class="achv-photo-wrap hidden" id="achv-photo-wrap">
+      <img id="achv-photo" src="" alt="">
+    </div>
+    <div class="achv-icon hidden" id="achv-icon"></div>
+    <div class="achv-title" id="achv-title"></div>
+    <div class="achv-desc" id="achv-desc"></div>
+    <button onclick="continueAchievement()">Продолжить</button>
+  </div>
+</div>
+
+<div class="achv-overlay" id="achv-gallery-overlay">
+  <div class="achv-gallery-card">
+    <div class="achv-gallery-head">
+      <div class="achv-eyebrow">Твои ачивки</div>
+      <h2 id="achv-gallery-count">0 из 4</h2>
+    </div>
+    <div class="achv-gallery-list" id="achv-gallery-list"></div>
+    <button class="ghost" onclick="closeAchvGallery()">Закрыть</button>
+  </div>
+</div>
+
+<div class="stage">
+
+  <!-- прогресс-созвездие -->
+  <div class="constellation" id="constellation"></div>
+
+  <!-- ============ ЭКРАН 0: ВВОД КОДА №1 ============ -->
+  <div class="screen" id="screen-code1">
+    <div class="card">
+      <div class="eyebrow">Глава I</div>
+      <h1>Здесь начинается твой квест</h1>
+      <p>На открытке спрятан код. Введи его — и приключение начнётся.</p>
+      <div class="field">
+        <label for="input-code1">КОД С ПИСЬМА</label>
+        <input type="text" id="input-code1" autocomplete="off" placeholder="••••••">
+      </div>
+      <div class="hint-error" id="error-code1"></div>
+      <button onclick="submitCode1()">Открыть</button>
+    </div>
+  </div>
+
+  <!-- ============ ЭКРАН 1: ТЕСТ №1 ============ -->
+  <div class="screen" id="screen-quiz1">
+    <div class="card">
+      <div class="eyebrow">Глава II</div>
+      <h1>Первое испытание</h1>
+      <p class="lead">Отвечай честно — вселенная считает.</p>
+      <div id="quiz1-questions"></div>
+      <div class="hint-error" id="error-quiz1"></div>
+      <button id="quiz1-submit-btn" onclick="submitQuiz('quiz1')">Ответить</button>
+    </div>
+  </div>
+
+  <!-- ============ ЭКРАН 2а: ТЕСТ №1 ПРОВАЛЕН ============ -->
+  <div class="screen" id="screen-quiz1-fail">
+    <div class="card">
+      <div class="eyebrow">Глава II · Итог</div>
+      <h1>Почти получилось</h1>
+      <div class="score-badge" id="quiz1-score-fail"></div>
+      <p>Судьба любит настойчивых. Попробуй ещё раз.</p>
+      <button onclick="retryQuiz('quiz1')">Попробовать снова</button>
+    </div>
+  </div>
+
+  <!-- ============ ЭКРАН 2б: ТЕСТ №1 ПРОЙДЕН + ВВОД КОДА №2 ============ -->
+  <div class="screen" id="screen-quiz1-success">
+    <div class="card">
+      <div class="eyebrow">Глава III</div>
+      <h1>Ты справилась ✨</h1>
+      <div class="score-badge" id="quiz1-score-success"></div>
+      <p id="gift1-text">Первый подарок уже твой. Загляни в [СЮДА ОПИСАНИЕ ПЕРВОГО ПОДАРКА].</p>
+      <div class="field">
+        <label for="input-code2">Хочешь узнать, что дальше? Введи второй код</label>
+        <input type="text" id="input-code2" autocomplete="off" placeholder="••••••">
+      </div>
+      <div class="hint-error" id="error-code2"></div>
+      <button onclick="submitCode2()">Продолжить</button>
+    </div>
+  </div>
+
+  <!-- ============ ЭКРАН 3: БЛОКИРОВКА / ТАЙМЕР ============ -->
+  <div class="screen" id="screen-lock">
+    <div class="card">
+      <div class="eyebrow">Глава IV</div>
+      <h1>Второй подарок ждёт своего часа</h1>
+      <p>Время — тоже часть подарка. Возвращайся, когда звёзды сойдутся:</p>
+      <div class="timer" id="timer">
+        <div class="unit"><div class="num" id="t-days">00</div><div class="label">дней</div></div>
+        <div class="unit"><div class="num" id="t-hours">00</div><div class="label">часов</div></div>
+        <div class="unit"><div class="num" id="t-min">00</div><div class="label">минут</div></div>
+        <div class="unit"><div class="num" id="t-sec">00</div><div class="label">секунд</div></div>
+      </div>
+      <div class="admin-toggle">
+        <button class="text-link" onclick="toggleAdminField()">У меня есть особый код</button>
+        <div id="admin-field" class="hidden">
+          <div class="field">
+            <input type="text" id="input-admin" autocomplete="off" placeholder="Особый код">
+          </div>
+          <div class="hint-error" id="error-admin"></div>
+          <button class="ghost" onclick="submitAdmin()">Снять блокировку</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ЭКРАН 4: ТЕСТ №2 ============ -->
+  <div class="screen" id="screen-quiz2">
+    <div class="card">
+      <div class="eyebrow">Глава V</div>
+      <h1>Финальное испытание</h1>
+      <p class="lead">Последний шаг перед финалом.</p>
+      <div id="quiz2-questions"></div>
+      <div class="hint-error" id="error-quiz2"></div>
+      <button id="quiz2-submit-btn" onclick="submitQuiz('quiz2')">Ответить</button>
+    </div>
+  </div>
+
+  <!-- ============ ЭКРАН 4а: ТЕСТ №2 ПРОВАЛЕН ============ -->
+  <div class="screen" id="screen-quiz2-fail">
+    <div class="card">
+      <div class="eyebrow">Глава V · Итог</div>
+      <h1>Ещё чуть-чуть</h1>
+      <div class="score-badge" id="quiz2-score-fail"></div>
+      <p>Финал уже так близко. Попробуй снова.</p>
+      <button onclick="retryQuiz('quiz2')">Попробовать снова</button>
+    </div>
+  </div>
+
+  <!-- ============ ЭКРАН 5: ФИНАЛ ============ -->
+  <div class="screen" id="screen-final">
+    <div class="card">
+      <div class="eyebrow">Финал</div>
+      <h1>С юбилеем, любовь моя 🤍</h1>
+      <div class="score-badge" id="quiz2-score-final"></div>
+      <p id="gift2-text">[СЮДА ОПИСАНИЕ ВТОРОГО ПОДАРКА — что она получает и где его найти]</p>
+      <p class="footnote">Квест пройден полностью.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* =========================================================
+   CONFIG — РЕДАКТИРУЙ ТОЛЬКО ЭТОТ БЛОК
+   ========================================================= */
+const CONFIG = {
+
+  // Коды доступа для ПЕРВОГО экрана — можно указать НЕСКОЛЬКО
+  // допустимых кодов в массиве (например, если раздал разные
+  // открытки разным людям). Любой из них подходит.
+  // Регистр не важен, пробелы по краям обрезаются.
+  CODE1: ["rT7iuX", "pG2clH", "zW8xwC", "qW1wcU"],
+
+  CODE2: "ЛЮБОВЬ",
+  ADMIN_CODE: "МАСТЕРКЛЮЧ",
+
+  // Порог прохождения теста (0.7 = 70%)
+  PASS_THRESHOLD: 0.7,
+
+  // На сколько дней блокируется второй тест после ввода второго кода
+  LOCK_DAYS: 30,
+
+  // Текст первого подарка (показывается сразу после теста №1)
+  GIFT1_TEXT: "Первый подарок уже твой. Загляни в [СЮДА ОПИСАНИЕ ПЕРВОГО ПОДАРКА].",
+
+  // Текст финального подарка
+  GIFT2_TEXT: "[СЮДА ОПИСАНИЕ ВТОРОГО ПОДАРКА — что она получает и где его найти]",
+
+  // ---- Тест №1 ----
+  // correct — индекс правильного варианта (считая с 0)
+  QUIZ1: [
+    {
+      q: "В каком городе мы познакомились?",
+      options: ["ПЛЕЙСХОЛДЕР A", "ПЛЕЙСХОЛДЕР B", "ПЛЕЙСХОЛДЕР C", "ПЛЕЙСХОЛДЕР D"],
+      correct: 0
+    },
+    {
+      q: "Сколько лет мы вместе в этом году?",
+      options: ["1", "2", "3", "4"],
+      correct: 0
+    },
+    {
+      q: "Наше первое совместное путешествие было в...",
+      options: ["ПЛЕЙСХОЛДЕР A", "ПЛЕЙСХОЛДЕР B", "ПЛЕЙСХОЛДЕР C", "ПЛЕЙСХОЛДЕР D"],
+      correct: 0
+    },
+    {
+      q: "Моё любимое блюдо, которое ты готовишь?",
+      options: ["ПЛЕЙСХОЛДЕР A", "ПЛЕЙСХОЛДЕР B", "ПЛЕЙСХОЛДЕР C", "ПЛЕЙСХОЛДЕР D"],
+      correct: 0
+    },
+    {
+      q: "Как называется наша первая общая песня?",
+      options: ["ПЛЕЙСХОЛДЕР A", "ПЛЕЙСХОЛДЕР B", "ПЛЕЙСХОЛДЕР C", "ПЛЕЙСХОЛДЕР D"],
+      correct: 0
+    }
+  ],
+
+  // ---- Тест №2 ----
+  QUIZ2: [
+    {
+      q: "О чём я мечтаю больше всего в ближайший год?",
+      options: ["ПЛЕЙСХОЛДЕР A", "ПЛЕЙСХОЛДЕР B", "ПЛЕЙСХОЛДЕР C", "ПЛЕЙСХОЛДЕР D"],
+      correct: 0
+    },
+    {
+      q: "Какой наш самый смешной момент вместе?",
+      options: ["ПЛЕЙСХОЛДЕР A", "ПЛЕЙСХОЛДЕР B", "ПЛЕЙСХОЛДЕР C", "ПЛЕЙСХОЛДЕР D"],
+      correct: 0
+    },
+    {
+      q: "Где бы я хотел(а) сделать тебе предложение / встретить важное событие?",
+      options: ["ПЛЕЙСХОЛДЕР A", "ПЛЕЙСХОЛДЕР B", "ПЛЕЙСХОЛДЕР C", "ПЛЕЙСХОЛДЕР D"],
+      correct: 0
+    }
+  ]
+};
+
+/* =========================================================
+   АЧИВКИ — что показывается за каждое достижение
+   ========================================================= */
+// photo: true — вместо иконки показывается фотокарточка (см. ACHV_PHOTO_DATA ниже)
+const ACHIEVEMENTS = {
+  code1: {
+    title: "Квест начался",
+    desc: "Ты нашла первый секретный код и открыла дверь в историю",
+    icon: "💌",
+    photo: true
+  },
+  quiz1: {
+    title: "Испытание пройдено",
+    desc: "Первый тест позади — вселенная впечатлена",
+    icon: "🏆"
+  },
+  code2: {
+    title: "Второй код найден",
+    desc: "Путь ко второму подарку открыт",
+    icon: "🔑"
+  },
+  quiz2: {
+    title: "Финальное испытание",
+    desc: "Ты прошла квест до самого конца",
+    icon: "👑"
+  }
+};
+const ACHV_ORDER = ["code1","quiz1","code2","quiz2"];
+
+// Встроенная фотография — используется в ачивке "Квест начался"
+const ACHV_PHOTO_DATA = "data:image/jpeg;base64,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";
+
+/* =========================================================
+   СТАРТ — ЗВЁЗДНЫЙ ФОН
+   ========================================================= */
+(function initStars(){
+  const wrap = document.getElementById('stars');
+  const count = window.innerWidth < 500 ? 40 : 70;
+  for(let i=0;i<count;i++){
+    const s = document.createElement('span');
+    s.style.left = Math.random()*100 + '%';
+    s.style.top = Math.random()*100 + '%';
+    s.style.animationDelay = (Math.random()*4) + 's';
+    wrap.appendChild(s);
+  }
+})();
+
+/* =========================================================
+   СОСТОЯНИЕ (сохраняется в localStorage — переживает
+   закрытие вкладки, перезагрузку, недели ожидания)
+   ========================================================= */
+const STORAGE_KEY = 'rtm_gift_state_v1';
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultState();
+    return Object.assign(defaultState(), JSON.parse(raw));
+  }catch(e){
+    return defaultState();
+  }
+}
+function defaultState(){
+  return {
+    code1Verified:false,
+    quiz1Passed:false,
+    quiz1LastScore:null,
+    code2Verified:false,
+    unlockTimestamp:null,
+    adminOverride:false,
+    quiz2Passed:false,
+    quiz2LastScore:null,
+    achievements:{ code1:false, quiz1:false, code2:false, quiz2:false }
+  };
+}
+function saveState(state){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+let state = loadState();
+
+/* Сброс памяти сайта: открой страницу с ?reset=1 в конце адреса —
+   всё сохранённое состояние сотрётся и покажется самый первый экран.
+   Например: rtm-gift.html?reset=1
+   После сброса URL автоматически очищается, чтобы обновление
+   страницы не стирало прогресс снова и снова. */
+(function checkResetParam(){
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('reset') === '1'){
+    localStorage.removeItem(STORAGE_KEY);
+    state = defaultState();
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+})();
+
+/* =========================================================
+   НАВИГАЦИЯ / РЕНДЕР ЭКРАНОВ
+   ========================================================= */
+const SCREENS = ['screen-code1','screen-quiz1','screen-quiz1-fail','screen-quiz1-success',
+                  'screen-lock','screen-quiz2','screen-quiz2-fail','screen-final'];
+
+function showScreen(id){
+  SCREENS.forEach(s=>{
+    document.getElementById(s).classList.remove('active');
+  });
+  document.getElementById(id).classList.add('active');
+}
+
+function stageIndex(){
+  if(!state.code1Verified) return 0;
+  if(!state.quiz1Passed) return 1;
+  if(!state.code2Verified) return 2;
+  if(!isUnlocked()) return 3;
+  if(!state.quiz2Passed) return 4;
+  return 5;
+}
+
+function renderConstellation(){
+  const total = 5; // code1, quiz1, code2, timer, quiz2/final
+  const done = stageIndex();
+  const el = document.getElementById('constellation');
+  el.innerHTML = '';
+  for(let i=0;i<total;i++){
+    const node = document.createElement('div');
+    node.className = 'node' + (i < done ? ' done' : (i===done ? ' done' : ''));
+    el.appendChild(node);
+    if(i < total-1){
+      const link = document.createElement('div');
+      link.className = 'link' + (i < done ? ' done' : '');
+      el.appendChild(link);
+    }
+  }
+}
+
+function isUnlocked(){
+  if(state.adminOverride) return true;
+  if(!state.unlockTimestamp) return false;
+  return Date.now() >= state.unlockTimestamp;
+}
+
+function render(){
+  renderConstellation();
+  const idx = stageIndex();
+  if(idx === 0){
+    showScreen('screen-code1');
+  } else if(idx === 1){
+    buildQuiz('quiz1', CONFIG.QUIZ1, 'quiz1-questions');
+    showScreen('screen-quiz1');
+  } else if(idx === 2){
+    document.getElementById('quiz1-score-success').textContent =
+      'Результат: ' + Math.round(state.quiz1LastScore*100) + '%';
+    document.getElementById('gift1-text').textContent = CONFIG.GIFT1_TEXT;
+    showScreen('screen-quiz1-success');
+  } else if(idx === 3){
+    showScreen('screen-lock');
+    startTimerLoop();
+  } else if(idx === 4){
+    buildQuiz('quiz2', CONFIG.QUIZ2, 'quiz2-questions');
+    showScreen('screen-quiz2');
+  } else if(idx === 5){
+    document.getElementById('quiz2-score-final').textContent =
+      'Результат: ' + Math.round(state.quiz2LastScore*100) + '%';
+    document.getElementById('gift2-text').textContent = CONFIG.GIFT2_TEXT;
+    showScreen('screen-final');
+  }
+}
+
+/* =========================================================
+   КОД №1
+   ========================================================= */
+function normalize(v){
+  return (v||'').trim().toLowerCase();
+}
+
+function submitCode1(){
+  const input = document.getElementById('input-code1');
+  const errorEl = document.getElementById('error-code1');
+  const validCodes = CONFIG.CODE1.map(normalize);
+
+  if(validCodes.includes(normalize(input.value))){
+    state.code1Verified = true;
+    saveState(state);
+    errorEl.textContent = '';
+    unlockAndShow('code1', render);
+  } else {
+    errorEl.textContent = 'Неверный код. Попробуй ещё раз.';
+    input.classList.remove('shake');
+    void input.offsetWidth;
+    input.classList.add('shake');
+  }
+}
+
+/* =========================================================
+   КОД №2
+   ========================================================= */
+function submitCode2(){
+  const input = document.getElementById('input-code2');
+  const errorEl = document.getElementById('error-code2');
+  if(normalize(input.value) === normalize(CONFIG.CODE2)){
+    state.code2Verified = true;
+    if(!state.unlockTimestamp){
+      state.unlockTimestamp = Date.now() + CONFIG.LOCK_DAYS*24*60*60*1000;
+    }
+    saveState(state);
+    errorEl.textContent = '';
+    unlockAndShow('code2', render);
+  } else {
+    errorEl.textContent = 'Неверный код. Попробуй ещё раз.';
+    input.classList.remove('shake');
+    void input.offsetWidth;
+    input.classList.add('shake');
+  }
+}
+
+/* =========================================================
+   ТЕСТЫ — по одному вопросу за раз
+   ========================================================= */
+// quizProgress[key]  — индекс вопроса, который сейчас показан
+// quizAnswers[key]   — { индексВопроса: индексВыбранногоВарианта }
+let quizProgress = { quiz1: 0, quiz2: 0 };
+let quizAnswers  = { quiz1: {}, quiz2: {} };
+
+function buildQuiz(key, questions, containerId){
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+
+  const qi = quizProgress[key];
+  const item = questions[qi];
+
+  const qDiv = document.createElement('div');
+  qDiv.className = 'question';
+
+  const qText = document.createElement('div');
+  qText.className = 'q-text';
+  qText.textContent = 'Вопрос ' + (qi+1) + ' из ' + questions.length + '. ' + item.q;
+  qDiv.appendChild(qText);
+
+  item.options.forEach((opt, oi)=>{
+    const label = document.createElement('label');
+    label.className = 'option';
+    if(quizAnswers[key][qi] === oi) label.classList.add('selected');
+
+    label.innerHTML =
+      '<input type="radio" name="'+key+'-q'+qi+'" value="'+oi+'"' +
+      (quizAnswers[key][qi] === oi ? ' checked' : '') +
+      '> <span>'+opt+'</span>';
+
+    label.querySelector('input').addEventListener('change', ()=>{
+      qDiv.querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));
+      label.classList.add('selected');
+      quizAnswers[key][qi] = oi;
+    });
+    qDiv.appendChild(label);
+  });
+
+  container.appendChild(qDiv);
+
+  const btn = document.getElementById(key + '-submit-btn');
+  if(btn){
+    btn.textContent = (qi === questions.length - 1) ? 'Ответить' : 'Далее';
+  }
+}
+
+function submitQuiz(key){
+  const questions = key === 'quiz1' ? CONFIG.QUIZ1 : CONFIG.QUIZ2;
+  const errorId = key === 'quiz1' ? 'error-quiz1' : 'error-quiz2';
+  const containerId = key === 'quiz1' ? 'quiz1-questions' : 'quiz2-questions';
+  const errorEl = document.getElementById(errorId);
+
+  const qi = quizProgress[key];
+
+  if(quizAnswers[key][qi] === undefined){
+    errorEl.textContent = 'Выбери один из вариантов ответа.';
+    return;
+  }
+  errorEl.textContent = '';
+
+  // Ещё не последний вопрос — показываем следующий
+  if(qi < questions.length - 1){
+    quizProgress[key] = qi + 1;
+    buildQuiz(key, questions, containerId);
+    return;
+  }
+
+  // Это был последний вопрос — считаем итоговый результат
+  let correctCount = 0;
+  questions.forEach((item, idx)=>{
+    if(quizAnswers[key][idx] === item.correct) correctCount++;
+  });
+
+  const score = correctCount / questions.length;
+  const passed = score >= CONFIG.PASS_THRESHOLD;
+
+  if(key === 'quiz1'){
+    state.quiz1LastScore = score;
+    if(passed){
+      state.quiz1Passed = true;
+      saveState(state);
+      unlockAndShow('quiz1', render);
+    } else {
+      saveState(state);
+      document.getElementById('quiz1-score-fail').textContent =
+        'Результат: ' + Math.round(score*100) + '%  (нужно ' + Math.round(CONFIG.PASS_THRESHOLD*100) + '%)';
+      showScreen('screen-quiz1-fail');
+    }
+  } else {
+    state.quiz2LastScore = score;
+    if(passed){
+      state.quiz2Passed = true;
+      saveState(state);
+      unlockAndShow('quiz2', render);
+    } else {
+      saveState(state);
+      document.getElementById('quiz2-score-fail').textContent =
+        'Результат: ' + Math.round(score*100) + '%  (нужно ' + Math.round(CONFIG.PASS_THRESHOLD*100) + '%)';
+      showScreen('screen-quiz2-fail');
+    }
+  }
+}
+
+function retryQuiz(key){
+  // Сбрасываем прогресс теста — начинаем заново с первого вопроса
+  quizProgress[key] = 0;
+  quizAnswers[key] = {};
+
+  if(key === 'quiz1'){
+    buildQuiz('quiz1', CONFIG.QUIZ1, 'quiz1-questions');
+    showScreen('screen-quiz1');
+  } else {
+    buildQuiz('quiz2', CONFIG.QUIZ2, 'quiz2-questions');
+    showScreen('screen-quiz2');
+  }
+}
+
+/* =========================================================
+   ТАЙМЕР БЛОКИРОВКИ
+   ========================================================= */
+let timerInterval = null;
+
+function startTimerLoop(){
+  if(timerInterval) clearInterval(timerInterval);
+  updateTimer();
+  timerInterval = setInterval(()=>{
+    updateTimer();
+    if(isUnlocked()){
+      clearInterval(timerInterval);
+      render();
+    }
+  }, 1000);
+}
+
+function updateTimer(){
+  const remaining = Math.max(0, state.unlockTimestamp - Date.now());
+  const days = Math.floor(remaining / 86400000);
+  const hours = Math.floor((remaining % 86400000) / 3600000);
+  const mins = Math.floor((remaining % 3600000) / 60000);
+  const secs = Math.floor((remaining % 60000) / 1000);
+  document.getElementById('t-days').textContent = String(days).padStart(2,'0');
+  document.getElementById('t-hours').textContent = String(hours).padStart(2,'0');
+  document.getElementById('t-min').textContent = String(mins).padStart(2,'0');
+  document.getElementById('t-sec').textContent = String(secs).padStart(2,'0');
+}
+
+/* =========================================================
+   АДМИН-КОД (снимает блокировку таймера)
+   ========================================================= */
+function toggleAdminField(){
+  document.getElementById('admin-field').classList.toggle('hidden');
+}
+
+function submitAdmin(){
+  const input = document.getElementById('input-admin');
+  const errorEl = document.getElementById('error-admin');
+  if(normalize(input.value) === normalize(CONFIG.ADMIN_CODE)){
+    state.adminOverride = true;
+    saveState(state);
+    if(timerInterval) clearInterval(timerInterval);
+    errorEl.textContent = '';
+    render();
+  } else {
+    errorEl.textContent = 'Неверный код.';
+  }
+}
+
+/* =========================================================
+   АЧИВКИ — показ карточки, счётчик, разблокировка
+   ========================================================= */
+let pendingAchvContinue = null;
+
+function updateAchvCounter(){
+  const earned = ACHV_ORDER.filter(id => state.achievements[id]).length;
+  document.getElementById('achv-counter-text').textContent = earned + '/' + ACHV_ORDER.length;
+  document.getElementById('achv-counter').classList.toggle('show', earned > 0);
+}
+
+function showAchievement(id, onContinue){
+  const def = ACHIEVEMENTS[id];
+  if(!def){
+    if(onContinue) onContinue();
+    return;
+  }
+
+  document.getElementById('achv-title').textContent = def.title;
+  document.getElementById('achv-desc').textContent = def.desc;
+
+  const photoWrap = document.getElementById('achv-photo-wrap');
+  const iconEl = document.getElementById('achv-icon');
+
+  if(def.photo){
+    document.getElementById('achv-photo').src = ACHV_PHOTO_DATA;
+    photoWrap.classList.remove('hidden');
+    iconEl.classList.add('hidden');
+  } else {
+    photoWrap.classList.add('hidden');
+    iconEl.classList.remove('hidden');
+    iconEl.textContent = def.icon;
+  }
+
+  pendingAchvContinue = onContinue;
+  const overlay = document.getElementById('achv-overlay');
+  overlay.classList.remove('hidden');
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=> overlay.classList.add('active'));
+  });
+}
+
+function continueAchievement(){
+  const overlay = document.getElementById('achv-overlay');
+  overlay.classList.remove('active');
+  const cb = pendingAchvContinue;
+  pendingAchvContinue = null;
+  setTimeout(()=>{
+    overlay.classList.add('hidden');
+    if(cb) cb();
+  }, 380);
+}
+
+// Отмечает ачивку полученной и показывает карточку.
+// onContinue вызывается после закрытия карточки (обычно — render()).
+// Если ачивка уже была получена раньше (например, при повторном
+// прохождении шага), карточка не показывается повторно.
+function unlockAndShow(id, onContinue){
+  const alreadyEarned = !!state.achievements[id];
+  state.achievements[id] = true;
+  saveState(state);
+  updateAchvCounter();
+  if(alreadyEarned){
+    if(onContinue) onContinue();
+    return;
+  }
+  showAchievement(id, onContinue);
+}
+
+/* ---- Галерея (просмотр всех ачивок по клику на счётчик) ---- */
+function renderAchvGallery(){
+  const list = document.getElementById('achv-gallery-list');
+  list.innerHTML = '';
+
+  ACHV_ORDER.forEach(id=>{
+    const def = ACHIEVEMENTS[id];
+    const earned = !!state.achievements[id];
+
+    const row = document.createElement('div');
+    row.className = 'achv-row' + (earned ? '' : ' locked');
+
+    const media = document.createElement('div');
+    media.className = 'achv-row-media';
+    if(earned && def.photo){
+      const img = document.createElement('img');
+      img.src = ACHV_PHOTO_DATA;
+      img.alt = '';
+      media.appendChild(img);
+    } else if(earned){
+      media.textContent = def.icon;
+    } else {
+      media.textContent = '🔒';
+    }
+
+    const text = document.createElement('div');
+    text.className = 'achv-row-text';
+    const title = document.createElement('div');
+    title.className = 'achv-row-title';
+    title.textContent = earned ? def.title : '???';
+    const desc = document.createElement('div');
+    desc.className = 'achv-row-desc';
+    desc.textContent = earned ? def.desc : 'Ещё не открыто';
+    text.appendChild(title);
+    text.appendChild(desc);
+
+    const check = document.createElement('div');
+    check.className = 'achv-row-check';
+    check.textContent = earned ? '✅' : '';
+
+    row.appendChild(media);
+    row.appendChild(text);
+    row.appendChild(check);
+    list.appendChild(row);
+  });
+
+  const earnedCount = ACHV_ORDER.filter(id => state.achievements[id]).length;
+  document.getElementById('achv-gallery-count').textContent = earnedCount + ' из ' + ACHV_ORDER.length;
+}
+
+function openAchvGallery(){
+  renderAchvGallery();
+  const overlay = document.getElementById('achv-gallery-overlay');
+  overlay.classList.remove('hidden');
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=> overlay.classList.add('active'));
+  });
+}
+
+function closeAchvGallery(){
+  const overlay = document.getElementById('achv-gallery-overlay');
+  overlay.classList.remove('active');
+  setTimeout(()=> overlay.classList.add('hidden'), 350);
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+updateAchvCounter();
+render();
+
+// Позволяет отправлять форму по Enter
+document.addEventListener('keydown', (e)=>{
+  if(e.key !== 'Enter') return;
+  const active = document.activeElement;
+  if(active && active.tagName === 'INPUT'){
+    if(active.id === 'input-code1') submitCode1();
+    if(active.id === 'input-code2') submitCode2();
+    if(active.id === 'input-admin') submitAdmin();
+  }
+});
+</script>
+</body>
+</html>
