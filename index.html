@@ -505,6 +505,106 @@ button.text-link{
   margin-top:20px;
 }
 
+.achv-counter{
+  cursor:pointer;
+  touch-action:manipulation;
+}
+@media (hover:hover) and (pointer:fine){
+  .achv-counter:hover{
+    border-color:var(--gold);
+  }
+}
+
+.achv-gallery-card{
+  width:100%;
+  max-width:400px;
+  background:linear-gradient(180deg, var(--bg-panel), var(--bg-panel-2));
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:26px 22px 22px;
+  text-align:left;
+  box-shadow:0 35px 80px rgba(0,0,0,.4);
+  transform:scale(.9) translateY(20px);
+  opacity:0;
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1), opacity .35s ease;
+  max-height:85vh;
+  overflow-y:auto;
+}
+.achv-overlay.active .achv-gallery-card{
+  transform:scale(1) translateY(0);
+  opacity:1;
+}
+.achv-gallery-head{
+  text-align:center;
+  margin-bottom:18px;
+}
+.achv-gallery-head .achv-eyebrow{
+  margin-bottom:6px;
+}
+.achv-gallery-head h2{
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:24px;
+  color:var(--cream);
+}
+.achv-gallery-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.achv-row{
+  display:flex;
+  align-items:center;
+  gap:13px;
+  padding:12px 13px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:rgba(156,95,40,.05);
+}
+.achv-row.locked{
+  opacity:.5;
+}
+.achv-row-media{
+  width:46px;
+  height:46px;
+  border-radius:12px;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  background:rgba(156,95,40,.10);
+  border:1px solid var(--line);
+  overflow:hidden;
+}
+.achv-row-media img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.achv-row-text{
+  flex:1;
+  min-width:0;
+}
+.achv-row-title{
+  font-size:14px;
+  font-weight:600;
+  color:var(--cream);
+  margin-bottom:2px;
+}
+.achv-row-desc{
+  font-size:12px;
+  line-height:1.4;
+  color:var(--muted);
+}
+.achv-row-check{
+  font-size:16px;
+  flex-shrink:0;
+}
+.achv-gallery-card button{
+  margin-top:20px;
+}
+
 /* =========================================================
    АДАПТАЦИЯ ПОД УЗКИЕ ЭКРАНЫ (iPhone и т.п.)
    ========================================================= */
@@ -542,7 +642,7 @@ button.text-link{
 
 <div class="stars" id="stars"></div>
 
-<div class="achv-counter" id="achv-counter">🏆 <span id="achv-counter-text">0/4</span></div>
+<div class="achv-counter" id="achv-counter" onclick="openAchvGallery()">🏆 <span id="achv-counter-text">0/4</span></div>
 
 <div class="achv-overlay" id="achv-overlay">
   <div class="achv-card">
@@ -554,6 +654,17 @@ button.text-link{
     <div class="achv-title" id="achv-title"></div>
     <div class="achv-desc" id="achv-desc"></div>
     <button onclick="continueAchievement()">Продолжить</button>
+  </div>
+</div>
+
+<div class="achv-overlay" id="achv-gallery-overlay">
+  <div class="achv-gallery-card">
+    <div class="achv-gallery-head">
+      <div class="achv-eyebrow">Твои ачивки</div>
+      <h2 id="achv-gallery-count">0 из 4</h2>
+    </div>
+    <div class="achv-gallery-list" id="achv-gallery-list"></div>
+    <button class="ghost" onclick="closeAchvGallery()">Закрыть</button>
   </div>
 </div>
 
@@ -1173,6 +1284,71 @@ function unlockAndShow(id, onContinue){
     return;
   }
   showAchievement(id, onContinue);
+}
+
+/* ---- Галерея (просмотр всех ачивок по клику на счётчик) ---- */
+function renderAchvGallery(){
+  const list = document.getElementById('achv-gallery-list');
+  list.innerHTML = '';
+
+  ACHV_ORDER.forEach(id=>{
+    const def = ACHIEVEMENTS[id];
+    const earned = !!state.achievements[id];
+
+    const row = document.createElement('div');
+    row.className = 'achv-row' + (earned ? '' : ' locked');
+
+    const media = document.createElement('div');
+    media.className = 'achv-row-media';
+    if(earned && def.photo){
+      const img = document.createElement('img');
+      img.src = ACHV_PHOTO_DATA;
+      img.alt = '';
+      media.appendChild(img);
+    } else if(earned){
+      media.textContent = def.icon;
+    } else {
+      media.textContent = '🔒';
+    }
+
+    const text = document.createElement('div');
+    text.className = 'achv-row-text';
+    const title = document.createElement('div');
+    title.className = 'achv-row-title';
+    title.textContent = earned ? def.title : '???';
+    const desc = document.createElement('div');
+    desc.className = 'achv-row-desc';
+    desc.textContent = earned ? def.desc : 'Ещё не открыто';
+    text.appendChild(title);
+    text.appendChild(desc);
+
+    const check = document.createElement('div');
+    check.className = 'achv-row-check';
+    check.textContent = earned ? '✅' : '';
+
+    row.appendChild(media);
+    row.appendChild(text);
+    row.appendChild(check);
+    list.appendChild(row);
+  });
+
+  const earnedCount = ACHV_ORDER.filter(id => state.achievements[id]).length;
+  document.getElementById('achv-gallery-count').textContent = earnedCount + ' из ' + ACHV_ORDER.length;
+}
+
+function openAchvGallery(){
+  renderAchvGallery();
+  const overlay = document.getElementById('achv-gallery-overlay');
+  overlay.classList.remove('hidden');
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=> overlay.classList.add('active'));
+  });
+}
+
+function closeAchvGallery(){
+  const overlay = document.getElementById('achv-gallery-overlay');
+  overlay.classList.remove('active');
+  setTimeout(()=> overlay.classList.add('hidden'), 350);
 }
 
 /* =========================================================
