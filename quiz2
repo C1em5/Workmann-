@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#ffe3b9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
+<title>RTM gift ent</title>
+<link rel="icon" type="image/png" href="d0cc9608-f3a8-438e-83e6-d7ee3111d599-removebg-preview (1).png
+">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-deep:#ffe3b9;
+  --bg-panel:#fffaf1;
+  --bg-panel-2:#fff2dc;
+  --line:#e6c393;
+  --gold:#9c5f28;
+  --gold-soft:#7a4a1e;
+  --cream:#3a2a1a;
+  --rose:#c9694f;
+  --muted:#8a7256;
+  --error:#b8433c;
+  --success:#3f8f66;
+  --font-display:'Cormorant Garamond', serif;
+  --font-body:'Inter', sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  font-family:var(--font-body);
+  background:
+    radial-gradient(ellipse at 20% 10%, rgba(156,95,40,.10), transparent 45%),
+    radial-gradient(ellipse at 80% 85%, rgba(201,105,79,.10), transparent 50%),
+    var(--bg-deep);
+  color:var(--cream);
+  min-height:100vh;
+  min-height:100dvh;
+  overflow-x:hidden;
+  position:relative;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-font-smoothing:antialiased;
+  overscroll-behavior-y:none;
+}
+.stars{ position:fixed; inset:0; pointer-events:none; z-index:0; }
+.stars span{
+  position:absolute; width:5px;height:5px; background:#fffaf1; border-radius:50%;
+  opacity:.5; box-shadow:0 0 6px rgba(255,250,241,.9); animation:twinkle 7s ease-in-out infinite;
+}
+@keyframes twinkle{ 0%,100%{opacity:.2;} 50%{opacity:.95;} }
+.stage{
+  position:relative; z-index:1; min-height:100vh; min-height:100dvh;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:calc(32px + env(safe-area-inset-top)) calc(18px + env(safe-area-inset-right))
+          calc(32px + env(safe-area-inset-bottom)) calc(18px + env(safe-area-inset-left));
+}
+.screen{
+  width:100%; max-width:460px; display:none; opacity:0; transform:translateY(14px);
+  transition:opacity .5s ease, transform .5s ease;
+}
+.screen.active{ display:block; opacity:1; transform:translateY(0); }
+.card{
+  background:linear-gradient(180deg, var(--bg-panel), var(--bg-panel-2));
+  border:1px solid var(--line); border-radius:22px; padding:38px 30px; text-align:center;
+  box-shadow:0 25px 60px rgba(156,95,40,.22);
+}
+.eyebrow{
+  font-family:var(--font-body); font-size:12px; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--gold); margin-bottom:10px;
+}
+h1{
+  font-family:var(--font-display); font-weight:600; font-size:32px; line-height:1.2;
+  margin-bottom:16px; color:var(--cream);
+}
+p{ font-size:15px; line-height:1.65; color:var(--muted); }
+.lead{ color:var(--cream); font-size:16px; margin-bottom:22px; }
+.constellation{ display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:28px; }
+.constellation .node{
+  width:9px;height:9px; border-radius:50%; background:var(--line);
+  transition:background .4s ease, box-shadow .4s ease;
+}
+.constellation .node.done{ background:var(--gold); box-shadow:0 0 10px rgba(156,95,40,.55); }
+.constellation .link{ width:22px;height:1px; background:var(--line); transition:background .4s ease; }
+.constellation .link.done{ background:var(--gold); }
+.field{ margin-top:22px; text-align:left; }
+label{
+  display:block; font-size:12px; letter-spacing:.05em; color:var(--muted);
+  margin-bottom:8px; text-transform:uppercase;
+}
+input[type=text]{
+  width:100%; padding:14px 16px; border-radius:12px; border:1px solid var(--line);
+  background:rgba(156,95,40,.06); color:var(--cream); font-family:var(--font-body);
+  font-size:16px; letter-spacing:.04em; outline:none; -webkit-appearance:none; appearance:none;
+  touch-action:manipulation; transition:border-color .2s ease, box-shadow .2s ease;
+}
+input[type=text]:focus{ border-color:var(--gold); box-shadow:0 0 0 3px rgba(156,95,40,.18); }
+input[type=text].shake{ animation:shake .4s ease; border-color:var(--error); }
+@keyframes shake{ 0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);} }
+.hint-error{ margin-top:10px; font-size:13px; color:var(--error); min-height:16px; }
+button{
+  width:100%; padding:15px; margin-top:22px; border:none; border-radius:12px;
+  font-family:var(--font-body); font-weight:600; font-size:15px; letter-spacing:.02em; cursor:pointer;
+  -webkit-appearance:none; appearance:none; touch-action:manipulation;
+  background:linear-gradient(135deg, var(--gold), #b98a4a); color:#ffffff;
+  transition:transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+}
+button:active{ transform:scale(.98); }
+@media (hover:hover) and (pointer:fine){
+  button:hover{ transform:translateY(-1px); box-shadow:0 10px 24px rgba(156,95,40,.22); }
+}
+button:disabled{ opacity:.4; cursor:not-allowed; transform:none; box-shadow:none; }
+button.ghost{ background:transparent; border:1px solid var(--line); color:var(--muted); font-weight:500; }
+@media (hover:hover) and (pointer:fine){
+  button.ghost:hover{ border-color:var(--gold); color:var(--gold-soft); box-shadow:none; }
+}
+button.text-link{
+  width:auto; background:none; padding:6px 0; margin-top:14px; font-size:12px;
+  letter-spacing:.05em; text-transform:uppercase; color:var(--muted);
+  text-decoration:underline; text-underline-offset:3px;
+}
+@media (hover:hover) and (pointer:fine){
+  button.text-link:hover{ color:var(--gold-soft); transform:none; box-shadow:none; }
+}
+.question{ text-align:left; margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
+.question:first-of-type{ border-top:none; padding-top:0; }
+.question .q-text{ font-family:var(--font-display); font-size:19px; color:var(--cream); margin-bottom:12px; }
+.option{
+  display:flex; align-items:center; gap:10px; padding:13px 14px; border-radius:10px;
+  border:1px solid var(--line); margin-bottom:8px; cursor:pointer; touch-action:manipulation;
+  transition:border-color .2s ease, background .2s ease;
+}
+@media (hover:hover) and (pointer:fine){ .option:hover{ border-color:var(--gold); } }
+.option input{ accent-color:var(--gold); width:19px; height:19px; flex-shrink:0; }
+.option.selected{ border-color:var(--gold); background:rgba(156,95,40,.10); }
+.option span{ font-size:14px; color:var(--cream); }
+.timer{ display:flex; justify-content:center; gap:14px; margin:26px 0 6px; }
+.timer .unit{ min-width:64px; }
+.timer .num{
+  font-family:var(--font-display); font-size:34px; color:var(--gold-soft); font-variant-numeric:tabular-nums;
+}
+.timer .label{
+  font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-top:2px;
+}
+.admin-toggle{ margin-top:26px; padding-top:18px; border-top:1px solid var(--line); }
+.score-badge{
+  display:inline-block; margin:6px 0 18px; padding:6px 16px; border-radius:999px;
+  border:1px solid var(--gold); color:var(--gold-soft); font-size:13px; letter-spacing:.04em;
+}
+.hidden{display:none !important;}
+.footnote{ margin-top:18px; font-size:11px; color:var(--line); }
+
+.achv-counter{
+  position:fixed; top:calc(14px + env(safe-area-inset-top)); right:14px; z-index:5;
+  display:flex; align-items:center; gap:6px; padding:7px 13px; border-radius:999px;
+  background:rgba(255,250,241,.75); border:1px solid var(--line); backdrop-filter:blur(6px);
+  font-size:12px; letter-spacing:.03em; color:var(--gold-soft); font-weight:600;
+  box-shadow:0 6px 18px rgba(156,95,40,.14); opacity:0; transform:translateY(-6px);
+  transition:opacity .4s ease, transform .4s ease; cursor:pointer; touch-action:manipulation;
+}
+.achv-counter.show{ opacity:1; transform:translateY(0); }
+@media (hover:hover) and (pointer:fine){ .achv-counter:hover{ border-color:var(--gold); } }
+.achv-overlay{
+  position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center;
+  padding:20px calc(20px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left));
+  background:rgba(20,12,4,.6); backdrop-filter:blur(4px); opacity:0; pointer-events:none;
+  transition:opacity .4s ease;
+}
+.achv-overlay.active{ opacity:1; pointer-events:auto; }
+.achv-card{
+  width:100%; max-width:360px; background:linear-gradient(180deg, var(--bg-panel), var(--bg-panel-2));
+  border:1px solid var(--line); border-radius:24px; padding:24px 22px 28px; text-align:center;
+  box-shadow:0 35px 80px rgba(0,0,0,.4); transform:scale(.35) translateY(70px) rotate(-8deg); opacity:0;
+  transition:transform .65s cubic-bezier(.34,1.56,.64,1), opacity .5s ease; max-height:88vh; overflow-y:auto;
+}
+.achv-overlay.active .achv-card{ transform:scale(1) translateY(0) rotate(0deg); opacity:1; }
+.achv-photo-wrap{
+  width:100%; border-radius:16px; overflow:hidden; border:1px solid var(--line); margin-bottom:16px;
+  box-shadow:0 14px 34px rgba(156,95,40,.28); transform:scale(1.08);
+  animation:achvPhotoIn .7s cubic-bezier(.34,1.56,.64,1) .15s both;
+}
+@keyframes achvPhotoIn{ 0%{transform:scale(1.3); filter:brightness(1.4);} 100%{transform:scale(1); filter:brightness(1);} }
+.achv-photo-wrap img{ width:100%; display:block; }
+.achv-icon{ font-size:46px; margin-bottom:10px; animation:achvPop .7s cubic-bezier(.34,1.56,.64,1) .15s both; }
+@keyframes achvPop{
+  0%{transform:scale(0) rotate(-25deg); opacity:0;}
+  60%{transform:scale(1.25) rotate(10deg); opacity:1;}
+  100%{transform:scale(1) rotate(0); opacity:1;}
+}
+.achv-eyebrow{ font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--gold); margin-bottom:8px; }
+.achv-title{ font-family:var(--font-display); font-weight:600; font-size:24px; color:var(--cream); margin-bottom:10px; }
+.achv-desc{ font-size:14px; line-height:1.6; color:var(--muted); margin-bottom:4px; }
+.achv-card button{ margin-top:20px; }
+.achv-gallery-card{
+  width:100%; max-width:400px; background:linear-gradient(180deg, var(--bg-panel), var(--bg-panel-2));
+  border:1px solid var(--line); border-radius:24px; padding:26px 22px 22px; text-align:left;
+  box-shadow:0 35px 80px rgba(0,0,0,.4); transform:scale(.9) translateY(20px); opacity:0;
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1), opacity .35s ease; max-height:85vh; overflow-y:auto;
+}
+.achv-overlay.active .achv-gallery-card{ transform:scale(1) translateY(0); opacity:1; }
+.achv-gallery-head{ text-align:center; margin-bottom:18px; }
+.achv-gallery-head .achv-eyebrow{ margin-bottom:6px; }
+.achv-gallery-head h2{ font-family:var(--font-display); font-weight:600; font-size:24px; color:var(--cream); }
+.achv-gallery-list{ display:flex; flex-direction:column; gap:10px; }
+.achv-row{
+  display:flex; align-items:center; gap:13px; padding:12px 13px; border-radius:14px;
+  border:1px solid var(--line); background:rgba(156,95,40,.05);
+}
+.achv-row.locked{ opacity:.5; }
+.achv-row-media{
+  width:46px; height:46px; border-radius:12px; flex-shrink:0; display:flex; align-items:center;
+  justify-content:center; font-size:22px; background:rgba(156,95,40,.10); border:1px solid var(--line);
+  overflow:hidden;
+}
+.achv-row-media img{ width:100%; height:100%; object-fit:cover; }
+.achv-row-text{ flex:1; min-width:0; }
+.achv-row-title{ font-size:14px; font-weight:600; color:var(--cream); margin-bottom:2px; }
+.achv-row-desc{ font-size:12px; line-height:1.4; color:var(--muted); }
+.achv-row-check{ font-size:16px; flex-shrink:0; }
+.achv-gallery-card button{ margin-top:20px; }
+
+@media (max-width:400px){
+  .card{ padding:30px 20px; }
+  .stage{
+    padding-left:calc(12px + env(safe-area-inset-left));
+    padding-right:calc(12px + env(safe-area-inset-right));
+  }
+  h1{ font-size:27px; }
+  .timer{ gap:8px; }
+  .timer .unit{ min-width:52px; }
+  .timer .num{ font-size:27px; }
+}
+@supports (padding: max(0px)){
+  .stage{ padding-bottom:max(32px, calc(24px + env(safe-area-inset-bottom))); }
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="achv-counter" id="achv-counter" onclick="openAchvGallery()">🏆 <span id="achv-counter-text">0/4</span></div>
+
+<div class="achv-overlay" id="achv-overlay">
+  <div class="achv-card">
+    <div class="achv-eyebrow">Ачивка получена</div>
+    <div class="achv-photo-wrap hidden" id="achv-photo-wrap">
+      <img id="achv-photo" src="" alt="">
+    </div>
+    <div class="achv-icon hidden" id="achv-icon"></div>
+    <div class="achv-title" id="achv-title"></div>
+    <div class="achv-desc" id="achv-desc"></div>
+    <button onclick="continueAchievement()">Продолжить</button>
+  </div>
+</div>
+
+<div class="achv-overlay" id="achv-gallery-overlay">
+  <div class="achv-gallery-card">
+    <div class="achv-gallery-head">
+      <div class="achv-eyebrow">Твои ачивки</div>
+      <h2 id="achv-gallery-count">0 из 4</h2>
+    </div>
+    <div class="achv-gallery-list" id="achv-gallery-list"></div>
+    <button class="ghost" onclick="closeAchvGallery()">Закрыть</button>
+  </div>
+</div>
+
+<div class="stage">
+
+  <div class="constellation" id="constellation"></div>
+
+  <div class="screen" id="screen-code1">
+    <div class="card">
+      <div class="eyebrow">Глава I</div>
+      <h1>Здесь начинается твой квест</h1>
+      <p>Введи код чтобы начать</p>
+      <div class="field">
+        <label for="input-code1">КОД С ПИСЬМА</label>
+        <input type="text" id="input-code1" autocomplete="off" placeholder="••••••">
+      </div>
+      <div class="hint-error" id="error-code1"></div>
+      <button onclick="submitCode1()">Открыть</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-quiz1">
+    <div class="card">
+      <div class="eyebrow">Глава II</div>
+      <h1>Первое испытание</h1>
+      <a href="game.html">Мини-игра</a>
+      <p class="lead">Отвечай честно — вселенная считает.</p>
+      <div id="quiz1-questions"></div>
+      <div class="hint-error" id="error-quiz1"></div>
+      <button id="quiz1-submit-btn" onclick="submitQuiz('quiz1')">Ответить</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-quiz1-fail">
+    <div class="card">
+      <div class="eyebrow">Глава II · Итог</div>
+      <h1>Почти получилось</h1>
+      <div class="score-badge" id="quiz1-score-fail"></div>
+      <p>Судьба любит настойчивых. Попробуй ещё раз.</p>
+      <button onclick="retryQuiz('quiz1')">Попробовать снова</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-quiz1-success">
+    <div class="card">
+      <div class="eyebrow">Глава III</div>
+      <h1>Ты справилась ✨</h1>
+      <div class="score-badge" id="quiz1-score-success"></div>
+      <p id="gift1-text">Первый подарок уже твой. Загляни в <a href="...">Cюда</a>.</p>
+      <button onclick="continueToLock()">Продолжить</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-lock">
+    <div class="card">
+      <div class="eyebrow">Глава IV</div>
+      <h1>Второй подарок ждёт своего часа</h1>
+      <p>Время — тоже часть подарка. Возвращайся, когда звёзды сойдутся:</p>
+      <div class="timer" id="timer">
+        <div class="unit"><div class="num" id="t-days">00</div><div class="label">дней</div></div>
+        <div class="unit"><div class="num" id="t-hours">00</div><div class="label">часов</div></div>
+        <div class="unit"><div class="num" id="t-min">00</div><div class="label">минут</div></div>
+        <div class="unit"><div class="num" id="t-sec">00</div><div class="label">секунд</div></div>
+      </div>
+      <div class="admin-toggle">
+        <button class="text-link" onclick="toggleAdminField()">У меня есть особый код</button>
+        <div id="admin-field" class="hidden">
+          <div class="field">
+            <input type="text" id="input-admin" autocomplete="off" placeholder="Особый код">
+          </div>
+          <div class="hint-error" id="error-admin"></div>
+          <button class="ghost" onclick="submitAdmin()">Снять блокировку</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+  <div class="screen" id="screen-code2-entry">
+    <div class="card">
+      <div class="eyebrow">Глава V</div>
+      <h1>Время пришло</h1>
+      <p>Хочешь узнать, что дальше? Введи второй код</p>
+      <div class="field">
+        <label for="input-code2">КОД</label>
+        <input type="text" id="input-code2" autocomplete="off" placeholder="••••••">
+      </div>
+      <div class="hint-error" id="error-code2"></div>
+      <button onclick="submitCode2()">Продолжить</button>
+    </div>
+  </div>
+
+<div class="screen" id="screen-quiz2">
+    <div class="card">
+      <div class="eyebrow">Глава V</div>
+      <h1>Финальное испытание</h1>
+      <p class="lead">Последний шаг перед финалом.</p>
+      <div id="quiz2-questions"></div>
+      <div class="hint-error" id="error-quiz2"></div>
+      <button id="quiz2-submit-btn" onclick="submitQuiz('quiz2')">Ответить</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-quiz2-fail">
+    <div class="card">
+      <div class="eyebrow">Глава V · Итог</div>
+      <h1>Ещё чуть-чуть</h1>
+      <div class="score-badge" id="quiz2-score-fail"></div>
+      <p>Финал уже так близко. Попробуй снова.</p>
+      <button onclick="retryQuiz('quiz2')">Попробовать снова</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-final">
+    <div class="card">
+      <div class="eyebrow">Финал</div>
+      <h1>С юбилеем, любовь моя 🤍</h1>
+      <div class="score-badge" id="quiz2-score-final"></div>
+      <p id="gift2-text">[СЮДА ОПИСАНИЕ ВТОРОГО ПОДАРКА — что она получает и где его найти]</p>
+      <p class="footnote">Квест пройден полностью.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const CONFIG = {
+  CODE1: ["rT7iuX", "pG2clH", "zW8xwC", "qW1wcU","1"],
+  CODE2: "2",
+  ADMIN_CODE: "boobs",
+  PASS_THRESHOLD: 0.8,
+  LOCK_DAYS: 30,
+  GIFT1_TEXT: "Первый подарок уже твой. перейди по ссылке тут будет ссылка на видеоподсказку].",
+  GIFT2_TEXT: "[СЮДА ОПИСАНИЕ ВТОРОГО ПОДАРКА — что она получает и где его найти]",
+  QUIZ1: [
+    { q: "Мой любимый фильм?", options: ["Залечь на дно в Брюгге", "В это Вендетта", "Константин", "Скоростной поезд"], correct: 0 },
+    { q: "тут я скрою вопрос от глаз вадима?", options: ["-16", "-30", "16", "30"], correct: 0 },
+    { q: "ПЛЕЙСХОЛДЕ", options: ["ПЛЕЙСХОЛДЕР A", "ПЛЕЙСХОЛДЕР B", "ПЛЕЙСХОЛДЕР C", "ПЛЕЙСХОЛДЕР D"], correct: 0 },
+    { q: "ПЛЕЙСХОЛД", options: ["ПЛЕЙСХОЛДЕР A", "ПЛЕЙСХОЛДЕР B", "ПЛЕЙСХОЛДЕР C", "ПЛЕЙСХОЛДЕР D"], correct: 0 },
+    { q: "ПЛЕЙСХОЛ", options: ["ПЛЕЙСХОЛДЕР A", "ПЛЕЙСХОЛДЕР B", "ПЛЕЙСХОЛДЕР C", "ПЛЕЙСХОЛДЕР D"], correct: 0 }
+  ],
+  QUIZ2: [
+    { q: "ПЛЕЙСХО?", options: ["ПЛЕЙСХОЛДЕР A", "ПЛЕЙСХОЛДЕР B", "ПЛЕЙСХОЛДЕР C", "ПЛЕЙСХОЛДЕР D"], correct: 0 },
+    { q: "ПЛЕЙСХОР?", options: ["ПЛЕЙСХОЛДЕР A", "ПЛЕЙСХОЛДЕР B", "ПЛЕЙСХОЛДЕР C", "ПЛЕЙСХОЛДЕР D"], correct: 0 },
+    { q: "ПЛЕЙСХДЕР", options: ["ПЛЕЙСХОЛДЕР A", "ПЛЕЙСХОЛДЕР B", "ПЛЕЙСХОЛДЕР C", "ПЛЕЙСХОЛДЕР D"], correct: 0 }
+  ]
+};
+
+// photo: путь к файлу — если указан, вместо иконки показывается фотокарточка
+const ACHIEVEMENTS = {
+  code1: { title: "Квест начался", desc: "Ты нашла первый секретный код и открыла дверь в историю", icon: "💌", photo: "photo1.jpg" },
+  quiz1: { title: "Испытание пройдено", desc: "Первый тест позади — вселенная впечатлена", icon: "🧠", photo: "photo2.png" },
+  code2: { title: "Второй код найден", desc: "Путь ко второму подарку открыт", icon: "🔑", photo: "photo3.jpg" },
+  quiz2: { title: "Финальное испытание", desc: "Ты прошла квест до самого конца", icon: "👑", photo: "" }
+};
+const ACHV_ORDER = ["code1","quiz1","code2","quiz2"];
+
+(function initStars(){
+  const wrap = document.getElementById('stars');
+  const count = window.innerWidth < 500 ? 40 : 70;
+  for(let i=0;i<count;i++){
+    const s = document.createElement('span');
+    s.style.left = Math.random()*100 + '%';
+    s.style.top = Math.random()*100 + '%';
+    s.style.animationDelay = (Math.random()*4) + 's';
+    wrap.appendChild(s);
+  }
+})();
+
+const STORAGE_KEY = 'rtm_gift_state_v1';
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultState();
+    return Object.assign(defaultState(), JSON.parse(raw));
+  }catch(e){ return defaultState(); }
+}
+function defaultState(){
+  return {
+    code1Verified:false, quiz1Passed:false, quiz1LastScore:null,
+    code2Verified:false, unlockTimestamp:null, adminOverride:false,
+    quiz2Passed:false, quiz2LastScore:null,
+    usedCode1:null,
+    fishingPassed:false,
+    gift1Seen:false,
+    achievements:{ code1:false, quiz1:false, code2:false, quiz2:false }
+  };
+}
+function saveState(state){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+let state = loadState();
+
+(function checkResetParam(){
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('reset') === '1'){
+    localStorage.removeItem(STORAGE_KEY);
+    state = defaultState();
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+})();
+
+const SCREENS = ['screen-code1','screen-quiz1','screen-quiz1-fail','screen-quiz1-success',
+                  'screen-lock','screen-code2-entry','screen-quiz2','screen-quiz2-fail','screen-final'];
+function showScreen(id){
+  SCREENS.forEach(s=>{ document.getElementById(s).classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+}
+function stageIndex(){
+  if(!state.code1Verified) return 0;
+  if(!state.quiz1Passed) return 1;
+  if(!state.gift1Seen) return 2;
+  if(!isUnlocked()) return 3;
+  if(!state.code2Verified) return 4;
+  if(!state.quiz2Passed) return 5;
+  return 6;
+
+}
+function renderConstellation(){
+  const total = 5;
+  const done = stageIndex();
+  const el = document.getElementById('constellation');
+  el.innerHTML = '';
+  for(let i=0;i<total;i++){
+    const node = document.createElement('div');
+    node.className = 'node' + (i < done ? ' done' : (i===done ? ' done' : ''));
+    el.appendChild(node);
+    if(i < total-1){
+      const link = document.createElement('div');
+      link.className = 'link' + (i < done ? ' done' : '');
+      el.appendChild(link);
+    }
+  }
+}
+function isUnlocked(){
+  if(state.adminOverride) return true;
+  if(!state.unlockTimestamp) return false;
+  return Date.now() >= state.unlockTimestamp;
+}
+function render(){
+  renderConstellation(); // (или renderAchievementShelf — как у тебя называется, не трогай эту строку)
+  if(state.quiz1Passed && !state.fishingPassed){
+    window.location.href = 'game.html';
+    return;
+  }
+const idx = stageIndex();
+  if(idx === 0){
+    showScreen('screen-code1');
+  } else if(idx === 1){
+    buildQuiz('quiz1', CONFIG.QUIZ1, 'quiz1-questions');
+    showScreen('screen-quiz1');
+  } else if(idx === 2){
+    document.getElementById('quiz1-score-success').textContent =
+      'Результат: ' + Math.round(state.quiz1LastScore*100) + '%';
+    showScreen('screen-quiz1-success');
+  } else if(idx === 3){
+    if(!state.unlockTimestamp){
+      state.unlockTimestamp = Date.now() + CONFIG.LOCK_DAYS*24*60*60*1000;
+      saveState(state);
+    }
+    showScreen('screen-lock');
+    startTimerLoop();
+  } else if(idx === 4){
+    showScreen('screen-code2-entry');
+  } else if(idx === 5){
+    buildQuiz('quiz2', CONFIG.QUIZ2, 'quiz2-questions');
+    showScreen('screen-quiz2');
+  } else if(idx === 6){
+    document.getElementById('quiz2-score-final').textContent =
+      'Результат: ' + Math.round(state.quiz2LastScore*100) + '%';
+    showScreen('screen-final');
+  }
+}
+
+function normalize(v){ return (v||'').trim().toLowerCase(); }
+
+function submitCode1(){
+  const input = document.getElementById('input-code1');
+  const errorEl = document.getElementById('error-code1');
+  const validCodes = CONFIG.CODE1.map(normalize);
+  const typed = normalize(input.value);
+  if(validCodes.includes(typed)){
+    state.code1Verified = true;
+    state.usedCode1 = typed;
+    saveState(state);
+    errorEl.textContent = '';
+    unlockAndShow('code1', render);
+  } else {
+    errorEl.textContent = 'Неверный код. Попробуй ещё раз.';
+    input.classList.remove('shake');
+    void input.offsetWidth;
+    input.classList.add('shake');
+  }
+}
+
+function submitCode2(){
+  const input = document.getElementById('input-code2');
+  const errorEl = document.getElementById('error-code2');
+  const typed = normalize(input.value);
+  const validCodes = CONFIG.CODE1.map(normalize).filter(c => c !== state.usedCode1);
+  if(validCodes.includes(typed)){
+    state.code2Verified = true;
+    saveState(state);
+    errorEl.textContent = '';
+    unlockAndShow('code2', render);
+  } else {
+    errorEl.textContent = 'Неверный код. Попробуй ещё раз.';
+    input.classList.remove('shake');
+    void input.offsetWidth;
+    input.classList.add('shake');
+  }
+}
+
+let quizProgress = { quiz1: 0, quiz2: 0 };
+let quizAnswers  = { quiz1: {}, quiz2: {} };
+function continueToLock(){
+  state.gift1Seen = true;
+  saveState(state);
+  render();
+}
+function buildQuiz(key, questions, containerId){
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  const qi = quizProgress[key];
+  const item = questions[qi];
+  const qDiv = document.createElement('div');
+  qDiv.className = 'question';
+  const qText = document.createElement('div');
+  qText.className = 'q-text';
+  qText.textContent = 'Вопрос ' + (qi+1) + ' из ' + questions.length + '. ' + item.q;
+  qDiv.appendChild(qText);
+  item.options.forEach((opt, oi)=>{
+    const label = document.createElement('label');
+    label.className = 'option';
+    if(quizAnswers[key][qi] === oi) label.classList.add('selected');
+    label.innerHTML =
+      '<input type="radio" name="'+key+'-q'+qi+'" value="'+oi+'"' +
+      (quizAnswers[key][qi] === oi ? ' checked' : '') +
+      '> <span>'+opt+'</span>';
+    label.querySelector('input').addEventListener('change', ()=>{
+      qDiv.querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));
+      label.classList.add('selected');
+      quizAnswers[key][qi] = oi;
+    });
+    qDiv.appendChild(label);
+  });
+  container.appendChild(qDiv);
+  const btn = document.getElementById(key + '-submit-btn');
+  if(btn){ btn.textContent = (qi === questions.length - 1) ? 'Ответить' : 'Далее'; }
+}
+
+function submitQuiz(key){
+  const questions = key === 'quiz1' ? CONFIG.QUIZ1 : CONFIG.QUIZ2;
+  const errorId = key === 'quiz1' ? 'error-quiz1' : 'error-quiz2';
+  const containerId = key === 'quiz1' ? 'quiz1-questions' : 'quiz2-questions';
+  const errorEl = document.getElementById(errorId);
+  const qi = quizProgress[key];
+  if(quizAnswers[key][qi] === undefined){
+    errorEl.textContent = 'Выбери один из вариантов ответа.';
+    return;
+  }
+  errorEl.textContent = '';
+  if(qi < questions.length - 1){
+    quizProgress[key] = qi + 1;
+    buildQuiz(key, questions, containerId);
+    return;
+  }
+  let correctCount = 0;
+  questions.forEach((item, idx)=>{ if(quizAnswers[key][idx] === item.correct) correctCount++; });
+  const score = correctCount / questions.length;
+  const passed = score >= CONFIG.PASS_THRESHOLD;
+  if(key === 'quiz1'){
+    state.quiz1LastScore = score;
+    if(passed){ state.quiz1Passed = true; saveState(state); unlockAndShow('quiz1', goToFishing); }
+    else {
+      saveState(state);
+      document.getElementById('quiz1-score-fail').textContent =
+        'Результат: ' + Math.round(score*100) + '%  (нужно ' + Math.round(CONFIG.PASS_THRESHOLD*100) + '%)';
+      showScreen('screen-quiz1-fail');
+    }
+  } else {
+    state.quiz2LastScore = score;
+    if(passed){ state.quiz2Passed = true; saveState(state); unlockAndShow('quiz2', render); }
+    else {
+      saveState(state);
+      document.getElementById('quiz2-score-fail').textContent =
+        'Результат: ' + Math.round(score*100) + '%  (нужно ' + Math.round(CONFIG.PASS_THRESHOLD*100) + '%)';
+      showScreen('screen-quiz2-fail');
+    }
+  }
+}
+function goToFishing(){
+  window.location.href = 'game.html';
+}
+function retryQuiz(key){
+  quizProgress[key] = 0;
+  quizAnswers[key] = {};
+  if(key === 'quiz1'){ buildQuiz('quiz1', CONFIG.QUIZ1, 'quiz1-questions'); showScreen('screen-quiz1'); }
+  else { buildQuiz('quiz2', CONFIG.QUIZ2, 'quiz2-questions'); showScreen('screen-quiz2'); }
+}
+
+let timerInterval = null;
+function startTimerLoop(){
+  if(timerInterval) clearInterval(timerInterval);
+  updateTimer();
+  timerInterval = setInterval(()=>{
+    updateTimer();
+    if(isUnlocked()){ clearInterval(timerInterval); render(); }
+  }, 1000);
+}
+function updateTimer(){
+  const remaining = Math.max(0, state.unlockTimestamp - Date.now());
+  const days = Math.floor(remaining / 86400000);
+  const hours = Math.floor((remaining % 86400000) / 3600000);
+  const mins = Math.floor((remaining % 3600000) / 60000);
+  const secs = Math.floor((remaining % 60000) / 1000);
+  document.getElementById('t-days').textContent = String(days).padStart(2,'0');
+  document.getElementById('t-hours').textContent = String(hours).padStart(2,'0');
+  document.getElementById('t-min').textContent = String(mins).padStart(2,'0');
+  document.getElementById('t-sec').textContent = String(secs).padStart(2,'0');
+}
+
+function toggleAdminField(){ document.getElementById('admin-field').classList.toggle('hidden'); }
+function submitAdmin(){
+  const input = document.getElementById('input-admin');
+  const errorEl = document.getElementById('error-admin');
+  if(normalize(input.value) === normalize(CONFIG.ADMIN_CODE)){
+    state.adminOverride = true;
+    saveState(state);
+    if(timerInterval) clearInterval(timerInterval);
+    errorEl.textContent = '';
+    render();
+  } else { errorEl.textContent = 'Неверный код.'; }
+}
+
+let pendingAchvContinue = null;
+function updateAchvCounter(){
+  const earned = ACHV_ORDER.filter(id => state.achievements[id]).length;
+  document.getElementById('achv-counter-text').textContent = earned + '/' + ACHV_ORDER.length;
+  document.getElementById('achv-counter').classList.toggle('show', earned > 0);
+}
+function showAchievement(id, onContinue){
+  const def = ACHIEVEMENTS[id];
+  if(!def){ if(onContinue) onContinue(); return; }
+  document.getElementById('achv-title').textContent = def.title;
+  document.getElementById('achv-desc').textContent = def.desc;
+  const photoWrap = document.getElementById('achv-photo-wrap');
+  const iconEl = document.getElementById('achv-icon');
+  if(def.photo){
+    document.getElementById('achv-photo').src = def.photo;
+    photoWrap.classList.remove('hidden');
+    iconEl.classList.add('hidden');
+  } else {
+    photoWrap.classList.add('hidden');
+    iconEl.classList.remove('hidden');
+    iconEl.textContent = def.icon;
+  }
+  pendingAchvContinue = onContinue;
+  const overlay = document.getElementById('achv-overlay');
+  overlay.classList.remove('hidden');
+  requestAnimationFrame(()=>{ requestAnimationFrame(()=> overlay.classList.add('active')); });
+}
+function continueAchievement(){
+  const overlay = document.getElementById('achv-overlay');
+  overlay.classList.remove('active');
+  const cb = pendingAchvContinue;
+  pendingAchvContinue = null;
+  setTimeout(()=>{ overlay.classList.add('hidden'); if(cb) cb(); }, 380);
+}
+function unlockAndShow(id, onContinue){
+  const alreadyEarned = !!state.achievements[id];
+  state.achievements[id] = true;
+  saveState(state);
+  updateAchvCounter();
+  if(alreadyEarned){ if(onContinue) onContinue(); return; }
+  showAchievement(id, onContinue);
+}
+
+function renderAchvGallery(){
+  const list = document.getElementById('achv-gallery-list');
+  list.innerHTML = '';
+  ACHV_ORDER.forEach(id=>{
+    const def = ACHIEVEMENTS[id];
+    const earned = !!state.achievements[id];
+    const row = document.createElement('div');
+    row.className = 'achv-row' + (earned ? '' : ' locked');
+    const media = document.createElement('div');
+    media.className = 'achv-row-media';
+    if(earned && def.photo){
+      const img = document.createElement('img');
+      img.src = def.photo;
+      img.alt = '';
+      media.appendChild(img);
+    } else if(earned){ media.textContent = def.icon; }
+    else { media.textContent = '🔒'; }
+    const text = document.createElement('div');
+    text.className = 'achv-row-text';
+    const title = document.createElement('div');
+    title.className = 'achv-row-title';
+    title.textContent = earned ? def.title : '???';
+    const desc = document.createElement('div');
+    desc.className = 'achv-row-desc';
+    desc.textContent = earned ? def.desc : 'Ещё не открыто';
+    text.appendChild(title);
+    text.appendChild(desc);
+    const check = document.createElement('div');
+    check.className = 'achv-row-check';
+    check.textContent = earned ? '✅' : '';
+    row.appendChild(media);
+    row.appendChild(text);
+    row.appendChild(check);
+    list.appendChild(row);
+  });
+  const earnedCount = ACHV_ORDER.filter(id => state.achievements[id]).length;
+  document.getElementById('achv-gallery-count').textContent = earnedCount + ' из ' + ACHV_ORDER.length;
+}
+function openAchvGallery(){
+  renderAchvGallery();
+  const overlay = document.getElementById('achv-gallery-overlay');
+  overlay.classList.remove('hidden');
+  requestAnimationFrame(()=>{ requestAnimationFrame(()=> overlay.classList.add('active')); });
+}
+function closeAchvGallery(){
+  const overlay = document.getElementById('achv-gallery-overlay');
+  overlay.classList.remove('active');
+  setTimeout(()=> overlay.classList.add('hidden'), 350);
+}
+
+updateAchvCounter();
+render();
+
+document.addEventListener('keydown', (e)=>{
+  if(e.key !== 'Enter') return;
+  const active = document.activeElement;
+  if(active && active.tagName === 'INPUT'){
+    if(active.id === 'input-code1') submitCode1();
+    if(active.id === 'input-code2') submitCode2();
+    if(active.id === 'input-admin') submitAdmin();
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+  :root{
+    --track-left: 45.84%;
+    --track-width: 18.75%;
+    --track-top: 5.43%;
+    --track-height: 86.2%;
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+  html,body{
+    margin:0; padding:0; height:100%;
+    background: radial-gradient(circle at 50% 20%, #2b3a55 0%, #12141f 70%);
+    overflow:hidden;
+    font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
+    touch-action: none;
+    user-select: none;
+  }
+  #stage{
+    position:relative;
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  #gameWrap{
+    position:relative;
+    width: min(46vmin, 340px);
+    aspect-ratio: 128 / 442;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap: 3%;
+  }
+  #tubeContainer{
+    position:relative;
+    height:100%;
+    width: 100%;
+    background-image:url("background1.png");
+    background-size:100% 100%;
+    background-repeat:no-repeat;
+    image-rendering: -webkit-optimize-contrast;
+  }
+  #track{
+    position:absolute;
+    left: var(--track-left);
+    top: var(--track-top);
+    width: var(--track-width);
+    height: var(--track-height);
+    overflow:visible;
+    border-radius: 3px;
+  }
+#bar{
+    position:absolute;
+    left:-11%;
+    width:130%;
+    height:30%;
+    top:60%;
+
+    background-image:url("green1.png");
+    background-size:100% 80%;
+    background-repeat:no-repeat;
+
+    pointer-events:none;
+}
+  #fishAnchor{
+    position:absolute;
+    left: var(--track-left);
+    top: var(--track-top);
+    width: var(--track-width);
+    height: var(--track-height);
+    overflow:visible;
+    pointer-events:none;
+    z-index:6;
+  }
+  #fish{
+    position:absolute;
+    width: 170%;
+    aspect-ratio: 1/1;
+    left: -35%;
+    top:80%;
+    background-image:url("fish1.png");
+    background-size:contain;
+    background-repeat:no-repeat;
+    background-position:center;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4));
+    transition: transform 0.15s ease-out;
+    pointer-events:none;
+  }
+
+  #gaugeWrap{
+    position:relative;
+    left: -19%;
+    height:97%;
+    width: 12%;
+    border-radius: 10px;
+    
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.6);
+    overflow:hidden;
+    display:flex;
+    align-items:flex-end;
+  }
+  #gaugeFill{
+    width:100%;
+    height:0%;
+    background-color: #ffd35c;
+    transition: height 0.1s linear;
+  }
+
+  #hud{
+    position:absolute;
+    top: 3%;
+    left:50%;
+    transform: translateX(-50%);
+    color:#fff;
+    font-size: clamp(12px, 2.6vmin, 18px);
+    font-weight:bold;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+    letter-spacing:0.5px;
+    pointer-events:none;
+  }
+
+  #overlay{
+    position:absolute;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    background:rgba(5,8,15,0.72);
+    z-index:20;
+    border-radius: 8px;
+    text-align:center;
+    padding: 20px;
+  }
+  #overlay.show{ display:flex; }
+  #overlay h1{
+    color:#fff;
+    font-size: clamp(20px, 5vmin, 32px);
+    margin: 0 0 8px 0;
+    text-shadow: 0 3px 6px rgba(0,0,0,0.6);
+  }
+  #overlay p{
+    color:#cfd8e3;
+    margin:0 0 18px 0;
+    font-size: clamp(12px, 2.8vmin, 16px);
+  }
+  #retryBtn{
+    padding: 10px 26px;
+    font-size: clamp(14px, 3vmin, 18px);
+    font-weight:bold;
+    border:none;
+    border-radius: 30px;
+    background: linear-gradient(180deg,#ffd35c,#f79a1e);
+    color:#3a2000;
+    box-shadow: 0 4px 0 #a35d00, 0 6px 10px rgba(0,0,0,0.4);
+    cursor:pointer;
+  }
+  #retryBtn:active{
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #a35d00;
+  }
+  #hint{
+    position:absolute;
+    bottom: 2%;
+    left:50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,0.75);
+    font-size: clamp(10px, 2.2vmin, 14px);
+    pointer-events:none;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+    white-space:nowrap;
+  }
